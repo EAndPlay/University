@@ -1,4 +1,4 @@
-#include <stdio.h>
+п»ї#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <locale.h>
@@ -54,16 +54,16 @@ int main()
     all_lfs[0] = &lf1;
     all_lfs[1] = &lf2;
     all_lfs[2] = &lf3;
-    printf("Формат ввода координат точек прямой: X1 Y1 X2 Y2\n");
-    input_line_coords(&lf1.ready_line, "Первая прямая: ");
-    input_line_coords(&lf2.ready_line, "Вторая прямая: ");
-    input_line_coords(&lf3.ready_line, "Третья прямая: ");
+    printf("Р¤РѕСЂРјР°С‚ РІРІРѕРґР° РєРѕРѕСЂРґРёРЅР°С‚ С‚РѕС‡РµРє РїСЂСЏРјРѕР№: X1 Y1 X2 Y2\n");
+    input_line_coords(&lf1.ready_line, "РџРµСЂРІР°СЏ РїСЂСЏРјР°СЏ: ");
+    input_line_coords(&lf2.ready_line, "Р’С‚РѕСЂР°СЏ РїСЂСЏРјР°СЏ: ");
+    input_line_coords(&lf3.ready_line, "РўСЂРµС‚СЊСЏ РїСЂСЏРјР°СЏ: ");
     init_lf(&lf1);
     init_lf(&lf2);
     init_lf(&lf3);
     if (!check_lfs_validation(all_lfs))
     {
-        printf("Невозможно найти все пересечения\n");
+        printf("РќРµРІРѕР·РјРѕР¶РЅРѕ РЅР°Р№С‚Рё РІСЃРµ РїРµСЂРµСЃРµС‡РµРЅРёСЏ\n");
         system("pause");
         return;
     }
@@ -74,15 +74,15 @@ int main()
     int intersections_count = _msize(intersections) / sizeof(intersection_point);
     if (intersections_count == 1)
     {
-        printf("Все прямые пересекаются в точке:%5.2f; %5.2f\n", intersections[0].intersection.x, intersections[0].intersection.y);
+        printf("Р’СЃРµ РїСЂСЏРјС‹Рµ РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ РІ С‚РѕС‡РєРµ:%5.2f; %5.2f\n", intersections[0].intersection.x, intersections[0].intersection.y);
     }
     else
     {
-        printf("Не все прямые пересекаются в одной точке\n");
+        printf("РќРµ РІСЃРµ РїСЂСЏРјС‹Рµ РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ РІ РѕРґРЅРѕР№ С‚РѕС‡РєРµ\n");
         for (int i = 0; i < intersections_count; i++)
         {
             intersection_point inter_point = intersections[i];
-            printf("Прямые %d и %d пересекаются в точке:%5.2f;%5.2f\n", inter_point.first_line_num, inter_point.second_line_num, inter_point.intersection.x, inter_point.intersection.y);
+            printf("РџСЂСЏРјС‹Рµ %d Рё %d РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ РІ С‚РѕС‡РєРµ:%5.2f;%5.2f\n", inter_point.first_line_num, inter_point.second_line_num, inter_point.intersection.x, inter_point.intersection.y);
         }
     }
     system("pause");
@@ -191,7 +191,7 @@ unsigned char check_lfs_validation(line_function** lfs_array)
         line* i_line = &i_lf->ready_line;
         if (*(long long*)&i_line->p1 == *(long long*)&i_line->p2)
         {
-            printf("Прямая %d не существует\n", i + 1);
+            printf("РџСЂСЏРјР°СЏ %d РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚\n", i + 1);
             continue;
         }
         for (int j = i + 1; j < array_length; j++)
@@ -202,17 +202,17 @@ unsigned char check_lfs_validation(line_function** lfs_array)
             if (*(long long*)&i_line->p1 == *(long long*)&j_line->p1
                 && *(long long*)&i_line->p2 == *(long long*)&j_line->p2)
             {
-                warning_str = "равны";
+                warning_str = "СЂР°РІРЅС‹";
                 goto Warn;
             }
             else if (i_lf->k == j_lf->k)
             {
-                warning_str = i_lf->b == j_lf->b ? "совпадают" : "параллельны";
+                warning_str = i_lf->b == j_lf->b ? "СЃРѕРІРїР°РґР°СЋС‚" : "РїР°СЂР°Р»Р»РµР»СЊРЅС‹";
                 goto Warn;
             }
             continue;
         Warn:
-            printf("Прямые %d и %d ", i + 1, j + 1);
+            printf("РџСЂСЏРјС‹Рµ %d Рё %d ", i + 1, j + 1);
             printf("%s\n", warning_str);
             result = 0;
         }
