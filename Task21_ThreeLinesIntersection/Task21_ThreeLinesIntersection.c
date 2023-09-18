@@ -44,10 +44,10 @@ int main()
     all_lfs[0] = &lf1;
     all_lfs[1] = &lf2;
     all_lfs[2] = &lf3;
-    printf("Формат ввода координат точек прямой: X1 Y1 X2 Y2\n");
-    input_line_coords(&lf1.ready_line, "Первая прямая: ");
-    input_line_coords(&lf2.ready_line, "Вторая прямая: ");
-    input_line_coords(&lf3.ready_line, "Третья прямая: ");
+    printf("Р¤РѕСЂРјР°С‚ РІРІРѕРґР° РєРѕРѕСЂРґРёРЅР°С‚ С‚РѕС‡РµРє РїСЂСЏРјРѕР№: X1 Y1 X2 Y2\n");
+    input_line_coords(&lf1.ready_line, "РџРµСЂРІР°СЏ РїСЂСЏРјР°СЏ: ");
+    input_line_coords(&lf2.ready_line, "Р’С‚РѕСЂР°СЏ РїСЂСЏРјР°СЏ: ");
+    input_line_coords(&lf3.ready_line, "РўСЂРµС‚СЊСЏ РїСЂСЏРјР°СЏ: ");
     init_lf(&lf1);
     init_lf(&lf2);
     init_lf(&lf3);
@@ -65,11 +65,11 @@ int main()
     //if (intersect1.x != intersect2.x || intersect1.y != intersect2.y || intersect1.x != intersect3.x || intersect1.y != intersect3.y || intersect2.x != intersect3.x
     //    || intersect2.y != intersect3.y)
     {
-        printf("Не все прямые пересекаются в одной точке");
+        printf("РќРµ РІСЃРµ РїСЂСЏРјС‹Рµ РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ РІ РѕРґРЅРѕР№ С‚РѕС‡РєРµ");
     }
     else
     {
-        printf("Пересечение:%5.2f %5.2f", intersect1.x, intersect1.y);
+        printf("РџРµСЂРµСЃРµС‡РµРЅРёРµ:%5.2f %5.2f", intersect1.x, intersect1.y);
     }
     //printf("%i %i %i\n", intersect1.x == intersect2.x, intersect1.x == intersect3.x, intersect2.x == intersect3.x);
     //printf("inter1:%5.2f %5.2f\n", intersect1.x, intersect1.y);
@@ -124,7 +124,7 @@ unsigned char check_lfs_validation(line_function** lfs_array)
         if (*(long long*)&i_line->p1 == *(long long*)&i_line->p2)
         //if (i_line->p1.x == i_line->p2.x && i_line->p1.y == i_line->p2.y)
         {
-            printf("Прямая %d не существует\n", i + 1);
+            printf("РџСЂСЏРјР°СЏ %d РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚\n", i + 1);
             continue;
         }
         for (int j = i + 1; j < array_length; j++)
@@ -135,25 +135,25 @@ unsigned char check_lfs_validation(line_function** lfs_array)
             if (*(long long*)&i_line->p1 == *(long long*)&j_line->p1
                 && *(long long*)&i_line->p2 == *(long long*)&j_line->p2)
             {
-                warning_str = "равны";
+                warning_str = "СЂР°РІРЅС‹";
                 goto Warn;
             }
             else if (i_lf->k == j_lf->k)
             {
-                warning_str = i_lf->b == j_lf->b ? "совпадают" : "параллельны";
+                warning_str = i_lf->b == j_lf->b ? "СЃРѕРІРїР°РґР°СЋС‚" : "РїР°СЂР°Р»Р»РµР»СЊРЅС‹";
                 //if (i_lf->b == j_lf->b)
                 //{
-                //    warning_str = "совпадают";
+                //    warning_str = "СЃРѕРІРїР°РґР°СЋС‚";
                 //}
                 //else// if (i_lf->flag == j_lf->flag)
                 //{
-                //    warning_str = "параллельны";
+                //    warning_str = "РїР°СЂР°Р»Р»РµР»СЊРЅС‹";
                 //}
                 goto Warn;
             }
             continue;
         Warn:
-            printf("Прямые %d и %d ", i + 1, j + 1);
+            printf("РџСЂСЏРјС‹Рµ %d Рё %d ", i + 1, j + 1);
             printf("%s\n", warning_str);
             result = 0;
         }
