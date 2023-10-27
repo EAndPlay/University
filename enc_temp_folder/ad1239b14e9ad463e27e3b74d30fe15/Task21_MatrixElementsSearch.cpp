@@ -22,7 +22,7 @@ int main()
 
 	if (!one_d_length)
 	{
-		std::cout << "Одномерная матрица пуста." << std::endl;
+		std::cout << "Одномерная матрица пуста.";
 		system("pause");
 		return 0;
 	}
@@ -34,7 +34,7 @@ int main()
 
 	if (!two_d_length)
 	{
-		std::cout << "Двумерная матрица пуста." << std::endl;
+		std::cout << "Двумерная матрица пуста.";
 		system("pause");
 		return 0;
 	}
