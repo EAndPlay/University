@@ -1,4 +1,6 @@
-﻿#include <iostream>
+﻿//Лабораторная работа по программированию №2. "Взаимно простые числа" Вариант №21. Гонцов А.М 1-43
+
+#include <iostream>
 #include <locale>
 
 int main()
