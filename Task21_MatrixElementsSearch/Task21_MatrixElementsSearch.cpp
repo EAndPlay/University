@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <locale>
 
+//Для удаления повторяющихся значений из строки матрицы
 #define NO_REPEATS
 
 int* get_array_elements_row();
@@ -20,6 +21,7 @@ int main()
 	if (!one_d_length)
 	{
 		std::cout << "Одномерная матрица пуста.";
+		system("pause");
 		return 0;
 	}
 
@@ -31,6 +33,7 @@ int main()
 	if (!two_d_length)
 	{
 		std::cout << "Двумерная матрица пуста.";
+		system("pause");
 		return 0;
 	}
 
@@ -69,7 +72,7 @@ int main()
 
 int* get_array_elements_row()
 {
-	int* array = (int*)malloc(1);
+	int* array = (int*) malloc(1);
 	int i = 0;
 	while (true)
 	{
