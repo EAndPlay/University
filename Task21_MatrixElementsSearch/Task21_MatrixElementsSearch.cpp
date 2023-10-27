@@ -93,7 +93,7 @@ int* get_array_elements_row()
 #ifdef NO_REPEATS
 	//Исключает повторяющиеся значения
 
-	//Для рекурсии
+	//Бесконечный цикл - для рекурсии
 	while (true)
 	{
 		bool flag = false;
