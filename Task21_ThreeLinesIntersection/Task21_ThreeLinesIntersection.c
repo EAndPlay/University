@@ -5,36 +5,32 @@
 #include <math.h>
 #include <locale.h>
 
-struct tagPOINT
+typedef struct tagPOINT
 {
     float x;
     float y;
-}
-typedef point;
+} point;
 
-struct tagLINE
+typedef struct tagLINE
 {
     point p1;
     point p2;
-}
-typedef line;
+} line;
 
-struct tagLINEFUNCTION
+typedef struct tagLINEFUNCTION
 {
     line ready_line;
     float k; //коэффициент
     float b; //свободный член
     unsigned char flag; //является ли прямая вертикальной
-}
-typedef line_function;
+} line_function;
 
-struct tagINTERSECTION_POINT
+typedef struct tagINTERSECTION_POINT
 {
     point intersection;
     int first_line_num;
     int second_line_num;
-}
-typedef intersection_point;
+} intersection_point;
 
 //Запрашивает коодинаты двух точек прямой
 void input_line_coords(line* target_line, const char* pre_input_text);

@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <locale>
 
+#define NO_REPEATS
+
 int* get_array_elements_row();
 
 int** get_2d_matrix();
@@ -71,6 +73,7 @@ int* get_array_elements_row()
 	int i = 0;
 	while (true)
 	{
+		//Если последний введённый символ Ввод - цикл завершается
 		if (std::cin.peek() == '\n') break;
 		array = (int*) realloc(array, (i + 1) * sizeof(int));
 		std::cin >> array[i];
@@ -84,7 +87,7 @@ int* get_array_elements_row()
 		i++;
 	}
 
-	int index = -1;
+#ifdef NO_REPEATS
 	//Исключает повторяющиеся значения
 
 	//Для рекурсии
@@ -110,6 +113,8 @@ int* get_array_elements_row()
 		}
 		if (!flag) break;
 	}
+#endif
+
 	std::cin.get();
 	return array;
 }
