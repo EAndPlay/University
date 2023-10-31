@@ -59,7 +59,7 @@ int main()
 		if (!strcmp(str, reversed_str))
 		{
 			palindrom_found = true;
-			std::cout << str << " - " << reversed_str << std::endl;
+			std::cout << str << std::endl;
 		}
 	}
 
