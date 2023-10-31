@@ -26,12 +26,6 @@ int main()
 		system("pause");
 		return 0;
 	}
-	else if (input_line_length < 3)
-	{
-		std::cout << "Текст не содержит слов." << std::endl;
-		system("pause");
-		return 0;
-	}
 	char** split = str_split(input_line, (char*)" ");
 	int split_count = _msize(split) / sizeof(size_t);
 	if (split_count == 0)
