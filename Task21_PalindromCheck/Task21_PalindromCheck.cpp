@@ -77,11 +77,26 @@ char* read_line()
 	int current_char = getchar();
 	while (current_char != 10) //\10 = \n
 	{
-		length++;
-		output_line = (char*)realloc(output_line, length + 1);
-		current_char |= 0b00100000; // 6th bit - register
-		output_line[length - 1] = (char)current_char;
+		switch (current_char)
+		{
+			case ',':
+			case '.':
+			case '!':
+			case '?':
+			case ':':
+			case ';':
+				break;
+			default:
+			{
+				length++;
+				output_line = (char*)realloc(output_line, length + 1);
+				current_char |= 0b00100000; // 6th bit - register
+				output_line[length - 1] = (char)current_char;
+				break;
+			}
+		}
 		current_char = getchar();
+		
 	}
 	output_line[length] = 0;
 	return output_line;
