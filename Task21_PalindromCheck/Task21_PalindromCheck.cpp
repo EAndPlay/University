@@ -1,12 +1,16 @@
-﻿//Лабораторная работа по программированию №5. "Взаимно простые числа" Вариант №21. Гонцов А.М 1-43
+﻿//Лабораторная работа по программированию №5. "Палиндромы" Вариант №21. Гонцов А.М 1-43
 
 #include <iostream>
 #include <Windows.h>
+#include <ctype.h>
 
+//Считывает строку неопределённого размера
 char* read_line();
 
+//Возвращает индекс первого найденного совпадения "value" в "input_text "
 int find_index(char*, char*);
 
+//Возвращает массив массив строк разделённых через "separator"
 char** str_split(char*, char*);
 
 int main()
@@ -19,18 +23,21 @@ int main()
 	if (!input_line_length)
 	{
 		std::cout << "Ничего не введено." << std::endl;
+		system("pause");
 		return 0;
 	}
 	else if (input_line_length < 3)
 	{
 		std::cout << "Текст не содержит слов." << std::endl;
+		system("pause");
 		return 0;
 	}
 	char** split = str_split(input_line, (char*)" ");
 	int split_count = _msize(split) / sizeof(size_t);
 	if (split_count == 0)
 	{
-		std::cout << "Текст не содержит слов." << std::endl;
+		std::cout << "Текст не содержит слов или между ними отсутствуют пробелы." << std::endl;
+		system("pause");
 		return 0;
 	}
 	bool palindrom_found = false;
@@ -42,6 +49,8 @@ int main()
 		if (str_length < 3) continue;
 
 		char* reversed_str = (char*)malloc(str_length + 1);
+
+		//Разворичивает строку
 		for (int j = 0; j < str_length; j++)
 		{
 			reversed_str[j] = str[str_length - j - 1];
@@ -58,6 +67,7 @@ int main()
 	{
 		std::cout << "Палиндромов не найдено." << std::endl;
 	}
+	system("pause");
 }
 
 char* read_line()
@@ -69,7 +79,8 @@ char* read_line()
 	{
 		length++;
 		output_line = (char*)realloc(output_line, length + 1);
-		output_line[length - 1] = (char) current_char;
+		current_char |= 0b00100000; // 6th bit - register
+		output_line[length - 1] = (char)current_char;
 		current_char = getchar();
 	}
 	output_line[length] = 0;
@@ -130,6 +141,7 @@ char** str_split(char* input_text, char* separator)
 		}
 	}
 
+	//Если кол-во сплитов > 0 и i не дошло до конца строки - добавляется остаток строки
 	if (split_count && i < text_length)
 	{
 		split_array = (char**)realloc(split_array, sizeof(size_t) * (split_count + 1));
