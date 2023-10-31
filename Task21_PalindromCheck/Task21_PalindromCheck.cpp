@@ -28,7 +28,7 @@ int main()
 	}
 	char** split = str_split(input_line, (char*)" ");
 	int split_count = _msize(split) / sizeof(size_t);
-	if (split_count == 0)
+	if (split_count == 1)
 	{
 		std::cout << "Текст не содержит слов или между ними отсутствуют пробелы." << std::endl;
 		system("pause");
