@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <Windows.h>
-#include <ctype.h>
 
 //Считывает строку неопределённого размера
 char* read_line();
@@ -28,12 +27,6 @@ int main()
 	}
 	char** split = str_split(input_line, (char*)" ");
 	int split_count = _msize(split) / sizeof(size_t);
-	if (split_count == 1)
-	{
-		std::cout << "Текст не содержит слов или между ними отсутствуют пробелы." << std::endl;
-		system("pause");
-		return 0;
-	}
 	bool palindrom_found = false;
 
 	for (int i = 0; i < split_count; i++)
@@ -44,7 +37,7 @@ int main()
 
 		char* reversed_str = (char*)malloc(str_length + 1);
 
-		//Разворичивает строку
+		//Разворачивает строку
 		for (int j = 0; j < str_length; j++)
 		{
 			reversed_str[j] = str[str_length - j - 1];
@@ -55,6 +48,7 @@ int main()
 			palindrom_found = true;
 			std::cout << str << std::endl;
 		}
+		free(reversed_str);
 	}
 
 	if (!palindrom_found)
@@ -79,6 +73,8 @@ char* read_line()
 			case '?':
 			case ':':
 			case ';':
+			case '(':
+			case ')':
 				break;
 			default:
 			{
