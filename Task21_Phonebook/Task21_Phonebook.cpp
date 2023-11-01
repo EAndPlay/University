@@ -7,6 +7,8 @@
 
 #include "StringExtensions.h"
 
+//Encoding: Cyrillic (Windows 1251)
+
 // +Code (XXX)-XXX-XX-XX
 typedef struct tagPHONENUMBER
 {
@@ -16,7 +18,7 @@ typedef struct tagPHONENUMBER
 
 typedef struct tagFULLNAME
 {
-	char* Surname;
+	char *Surname;
 	char *Name;
 	char *DadSurname;
 } field_fullname;
@@ -47,32 +49,27 @@ int main()
 	memset(line_buffer, 0, kLineBufferSize);
 	while (pb_stream.getline(line_buffer, kLineBufferSize))
 	{
-		//TODO: make russian chars readable from UTF-8
 		//std::cout << line_buffer << std::endl;
-		char** split = str_split(line_buffer, (char*)" ");
+		char** field_split = str_split(line_buffer, (char*)" ");
 		phonebook_field* field = (phonebook_field*)malloc(sizeof(phonebook_field));
 
 		//0 - surname, 1 - name, 2 - dad surname
-		int surname_length = strlen(split[0]);
-		int name_length = strlen(split[1]);
-		int dadsurname_length = strlen(split[2]);
+		int surname_length = strlen(field_split[0]);
+		int name_length = strlen(field_split[1]);
+		int dadsurname_length = strlen(field_split[2]);
 		int fullname_length = surname_length + name_length + dadsurname_length + 3;
 
-		memcpy(field, split, sizeof(field_fullname));
+		memcpy(field, field_split, sizeof(field_fullname));
 
-		char** countrycode_split = str_split(split[3], (char*)"+");
+		char** countrycode_split = str_split(field_split[3], (char*)"+");
 		field->PhoneNumber.CountryCode = atoi(countrycode_split[1]);
-		field->PhoneNumber.Number = split[4];
+		field->PhoneNumber.Number = field_split[4];
 
 		free(countrycode_split[0]);
-		//free(countrycode_split[1]);
+		//free(countrycode_split[1]); //heap corruption: [1] places after heap?
 		free(countrycode_split);
-		for (int i = 0; i < 4; i++)
-		{
-			if (split[i])
-				free(split[i]);
-		}
-		free(split);
+		free(field_split[3]);
+		free(field_split);
 
 		phonebook = (phonebook_field**)realloc(phonebook, (fields_count + 1) * sizeof(phonebook_field));
 		phonebook[fields_count] = field;
