@@ -30,22 +30,27 @@ typedef struct tagPHONEBOOK_FIELD
 	field_phone PhoneNumber;
 } phonebook_field;
 
-const int kLineBufferSize = 128;
+const int kLineBufferSize = 1023;
+const int kSymbolsTable = 1251;
+
+//Путь до файла "телефонного справочника"
+const char* kDBFilePath = "Z:\\Development\\University\\Debug\\PhoneBook";
 
 int main()
 {
-	//setlocale(LC_ALL, "ru");
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-	std::ifstream pb_stream("Z:\\Development\\University\\Debug\\PhoneBook", std::ios_base::in);
+	SetConsoleCP(kSymbolsTable);
+	SetConsoleOutputCP(kSymbolsTable);
+	std::ifstream pb_stream(kDBFilePath, std::ios_base::in);
+
 	pb_stream.seekg(0, std::ios::end);
 	std::streampos file_size = pb_stream.tellg();
 	pb_stream.seekg(0, std::ios::beg);
+
 	std::cout << "File size: " << file_size << std::endl;
 	//int fields_count = file_size / sizeof(phonebook_field);
 	phonebook_field** phonebook = (phonebook_field**)malloc(1);
 	int fields_count = 0;
-	char *line_buffer = (char*)malloc(kLineBufferSize);
+	char *line_buffer = (char*)malloc(kLineBufferSize + 1);
 	memset(line_buffer, 0, kLineBufferSize);
 	while (pb_stream.getline(line_buffer, kLineBufferSize))
 	{
@@ -78,19 +83,71 @@ int main()
 	}
 
 	char* input_line;
+	int input_line_length;
+
+	field_fullname* fullname;
+	field_phone* phone_number;
+
 	do
 	{
-		input_line = read_line();
-		//TODO: req for family
-		//same family reqs choice for exact human by nums
+		std::cout << "Введите фамилию: " << std::endl;
+		input_line = read_line(input_line_length);
+		int people_count = 0;
+		int* found_people = (int*)malloc(1); // [local_arr_index] = phonebook_index
+		int found_people_count = 0;
+		for (int i = 0; i < fields_count; i++)
+		{
+			if (!_strnicmp(input_line, phonebook[i]->FullName.Surname, input_line_length))
+			{
+				found_people = (int*)realloc(found_people, (found_people_count + 1) * sizeof(int));
+				found_people[found_people_count] = i;
+				found_people_count++;
+			}
+		}
+
+		if (!found_people_count)
+		{
+			std::cout << "Не найдено человека с такой фамилией." << std::endl;
+		}
+		else if (found_people_count == 1)
+		{
+			fullname = &phonebook[*found_people]->FullName;
+			phone_number = &phonebook[*found_people]->PhoneNumber;
+			std::cout << fullname->Surname << " " << fullname->Name << " " << fullname->DadSurname << " +" << phone_number->CountryCode << " " << phone_number->Number << std::endl;
+		}
+		else
+		{
+			std::cout << "Выберите конкретного человека, введя его номер из списка:" << std::endl;
+			for (int i = 0; i < found_people_count; i++)
+			{
+				fullname = &phonebook[i]->FullName;
+				std::cout << i + 1 << ": " << fullname->Surname << " " << fullname->Name << " " << fullname->DadSurname << std::endl;
+			}
+			int target_index;
+			while (true)
+			{
+				std::cin >> target_index;
+				if (std::cin.fail())
+				{
+					std::cout << "Введён неверный тип данных. Введите индекс снова:" << std::endl;
+					continue;
+				}
+				else if (target_index < 1 || target_index > found_people_count)
+				{
+					std::cout << "Введён неправильный индекс. Введите индекс снова:" << std::endl;
+					continue;
+				}
+				break;
+			}
+			target_index--;
+
+			phone_number = &phonebook[target_index]->PhoneNumber;
+			std::cout << '+' << phone_number->CountryCode << ' ' << phone_number->Number << std::endl;
+		}
+		free(found_people);
 		free(input_line);
+		std::cout << std::endl;
 		input_line = read_line();
 	} while (*input_line);
 	free(input_line);
-	//for (int i = 0; i < fields_count; i++)
-	//{
-	//	std::cout << phonebook[i]->FullName.Surname << " " << phonebook[i]->FullName.Name << " " << phonebook[i]->FullName.DadSurname << " +" << (int)phonebook[i]->PhoneNumber.CountryCode << " " << phonebook[i]->PhoneNumber.Number << std::endl;
-	//}
-
-
 }

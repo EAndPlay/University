@@ -1,35 +1,25 @@
 #include <iostream>
 
-char* read_line()
+char* read_line(int& length)
 {
 	char* output_line = (char*)malloc(1);
-	int length = 0;
+	length = 0;
 	int current_char = getchar();
 	while (current_char != 10) //\10 = \n
 	{
-		switch (current_char)
-		{
-		case ',':
-		case '.':
-		case '!':
-		case '?':
-		case ':':
-		case ';':
-			break;
-		default:
-		{
-			length++;
-			output_line = (char*)realloc(output_line, length + 1);
-			current_char |= 0b00100000; // 6th bit - register
-			output_line[length - 1] = (char)current_char;
-			break;
-		}
-		}
+		length++;
+		output_line = (char*)realloc(output_line, length + 1);
+		output_line[length - 1] = (char)current_char;
 		current_char = getchar();
-
 	}
 	output_line[length] = 0;
 	return output_line;
+}
+
+char* read_line()
+{
+	int unavaible_length;
+	return read_line(unavaible_length);
 }
 
 int find_index(char* input_text, char* value)
