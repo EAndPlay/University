@@ -20,9 +20,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3e6acb12-a698-4fff-9645-9ea91ec125b3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Task21_Phonebook/StringExtensions.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Task21_Phonebook/StringExtensions.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Task21_Phonebook/StringExtensions.h" beforeDir="false" afterPath="$PROJECT_DIR$/Task21_Phonebook/StringExtensions.h" afterDir="false" />
+    <list default="true" id="3e6acb12-a698-4fff-9645-9ea91ec125b3" name="Changes" comment="Final">
       <change beforePath="$PROJECT_DIR$/Task21_Phonebook/Task21_Phonebook.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Task21_Phonebook/Task21_Phonebook.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,6 +35,20 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "EAndPlay"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="782d1bf7-c3c7-4108-86d7-ca4826cd5c06" />
+        <option name="url" value="https://github.com/EAndPlay/University.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
     <option name="majorVersion" value="2023" />
@@ -50,23 +62,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;Z:/Development/University/Task21_Phonebook/Task21_Phonebook.vcxproj&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.C/C++&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "Z:/Development/University/Task21_Phonebook/Task21_Phonebook.vcxproj",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.C/C++",
+    "structure.view.defaults.are.configured": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="CMake Application.University">
     <configuration name="Unnamed" type="CLionExternalRunConfiguration" factoryName="Application" nameIsGenerated="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" RUN_PATH="$PROJECT_DIR$/Debug/Task21_Phonebook.exe">
       <method v="2">
@@ -104,8 +117,25 @@
       <option name="presentableId" value="Default" />
       <updated>1699499177545</updated>
       <workItem from="1699499178549" duration="485000" />
-      <workItem from="1699548189345" duration="9937000" />
+      <workItem from="1699548189345" duration="10146000" />
     </task>
+    <task id="LOCAL-00001" summary="Final">
+      <option name="closed" value="true" />
+      <created>1699570467288</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1699570467288</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Final">
+      <option name="closed" value="true" />
+      <created>1699570565344</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1699570565344</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -116,5 +146,9 @@
     <isAutomaticCheckingOnLaunch value="false" />
     <isAutomaticFoundErrors value="true" />
     <isAutomaticFoundErrors value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Final" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final" />
   </component>
 </project>
