@@ -74,6 +74,8 @@ int main()
         fields_count++;
         memset(line_buffer, 0, kLineBufferSize);
     }
+    free(line_buffer);
+    pb_stream.close();
 
     char* input_line;
 
@@ -150,5 +152,4 @@ int main()
         std::cout << std::endl;
     }
     free(input_line);
-    pb_stream.close();
 }
