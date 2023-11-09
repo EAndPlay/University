@@ -20,8 +20,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3e6acb12-a698-4fff-9645-9ea91ec125b3" name="Changes" comment="Final">
-      <change beforePath="$PROJECT_DIR$/Task21_Phonebook/Task21_Phonebook.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Task21_Phonebook/Task21_Phonebook.cpp" afterDir="false" />
+    <list default="true" id="3e6acb12-a698-4fff-9645-9ea91ec125b3" name="Changes" comment="Stream close">
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-Debug-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-Debug-log.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +117,7 @@
       <option name="presentableId" value="Default" />
       <updated>1699499177545</updated>
       <workItem from="1699499178549" duration="485000" />
-      <workItem from="1699548189345" duration="10146000" />
+      <workItem from="1699548189345" duration="10456000" />
     </task>
     <task id="LOCAL-00001" summary="Final">
       <option name="closed" value="true" />
@@ -135,7 +135,23 @@
       <option name="project" value="LOCAL" />
       <updated>1699570565344</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Header fix + Reencoding">
+      <option name="closed" value="true" />
+      <created>1699570682630</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1699570682630</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Stream close">
+      <option name="closed" value="true" />
+      <created>1699570944936</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1699570944936</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -149,6 +165,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Final" />
-    <option name="LAST_COMMIT_MESSAGE" value="Final" />
+    <MESSAGE value="Header fix + Reencoding" />
+    <MESSAGE value="Stream close" />
+    <option name="LAST_COMMIT_MESSAGE" value="Stream close" />
   </component>
 </project>
