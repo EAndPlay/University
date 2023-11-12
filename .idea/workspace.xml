@@ -20,8 +20,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3e6acb12-a698-4fff-9645-9ea91ec125b3" name="Changes" comment="Stream close">
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-Debug-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-Debug-log.txt" afterDir="false" />
+    <list default="true" id="3e6acb12-a698-4fff-9645-9ea91ec125b3" name="Changes" comment="Header fix">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Task21_PalindromCheck/Task21_PalindromCheck.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Task21_PalindromCheck/Task21_PalindromCheck.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Task21_Phonebook/Task21_Phonebook.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Task21_Phonebook/Task21_Phonebook.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.ninja_deps" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/.ninja_deps" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/.ninja_log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/University.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/University.exe" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,12 +40,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "EAndPlay"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;EAndPlay&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
@@ -70,7 +75,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "Z:/Development/University/Task21_Phonebook/Task21_Phonebook.vcxproj",
+    "last_opened_file_path": "Z:/Development/University/Task21_LinesPosition",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -80,10 +85,10 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="CMake Application.University">
-    <configuration name="Unnamed" type="CLionExternalRunConfiguration" factoryName="Application" nameIsGenerated="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" RUN_PATH="$PROJECT_DIR$/Debug/Task21_Phonebook.exe">
+  <component name="RunManager" selected="CMake Application.LinesPosition">
+    <configuration name="LinesPosition" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="University" TARGET_NAME="University" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="University" RUN_TARGET_NAME="University">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="University" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="University" TARGET_NAME="University" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="University" RUN_TARGET_NAME="University">
@@ -104,8 +109,8 @@
     </configuration>
     <list>
       <item itemvalue="C/C++ File.Task21_Phonebook.cpp" />
+      <item itemvalue="CMake Application.LinesPosition" />
       <item itemvalue="CMake Application.University" />
-      <item itemvalue="Custom Build Application.Unnamed" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -117,7 +122,13 @@
       <option name="presentableId" value="Default" />
       <updated>1699499177545</updated>
       <workItem from="1699499178549" duration="485000" />
-      <workItem from="1699548189345" duration="10456000" />
+      <workItem from="1699548189345" duration="10593000" />
+      <workItem from="1699571141353" duration="2471000" />
+      <workItem from="1699580197958" duration="115000" />
+      <workItem from="1699634856273" duration="41000" />
+      <workItem from="1699638437846" duration="870000" />
+      <workItem from="1699715649075" duration="76000" />
+      <workItem from="1699716347644" duration="119000" />
     </task>
     <task id="LOCAL-00001" summary="Final">
       <option name="closed" value="true" />
@@ -151,7 +162,15 @@
       <option name="project" value="LOCAL" />
       <updated>1699570944936</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Header fix">
+      <option name="closed" value="true" />
+      <created>1699571041452</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1699571041452</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,6 +186,7 @@
     <MESSAGE value="Final" />
     <MESSAGE value="Header fix + Reencoding" />
     <MESSAGE value="Stream close" />
-    <option name="LAST_COMMIT_MESSAGE" value="Stream close" />
+    <MESSAGE value="Header fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Header fix" />
   </component>
 </project>
