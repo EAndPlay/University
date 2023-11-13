@@ -1,3 +1,5 @@
+//Лабораторная работа по программированию №4. "Положение прямых" Вариант №21. Гонцов А.М 1-43
+
 #include <iostream>
 #include <cmath>
 #include <windows.h>
@@ -64,6 +66,8 @@ int main()
             if (std::cin.fail())
             {
                 std::cout << std::endl << "Введён неверный тип данных. Начните весь ввод заного." << std::endl;
+                system("pause");
+                return 0;
             }
         }
     }
