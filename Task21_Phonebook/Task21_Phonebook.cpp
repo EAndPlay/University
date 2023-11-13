@@ -1,4 +1,4 @@
-//Лабораторная работа по программированию №6. "Телефонный справочник" Вариант №21. Гонцов А.М 1-43
+//Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ СЂР°Р±РѕС‚Р° РїРѕ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЋ в„–6. "РўРµР»РµС„РѕРЅРЅС‹Р№ СЃРїСЂР°РІРѕС‡РЅРёРє" Р’Р°СЂРёР°РЅС‚ в„–21. Р“РѕРЅС†РѕРІ Рђ.Рњ 1-43
 
 #include <iostream>
 #include <fstream>
@@ -33,7 +33,7 @@ typedef struct tagPHONEBOOK_FIELD
 const int kLineBufferSize = 1023;
 const int kSymbolsTable = 1251;
 
-//Путь до файла "телефонного справочника"
+//РџСѓС‚СЊ РґРѕ С„Р°Р№Р»Р° "С‚РµР»РµС„РѕРЅРЅРѕРіРѕ СЃРїСЂР°РІРѕС‡РЅРёРєР°"
 const char* kDBFilePath = "Z:\\Development\\University\\Debug\\PhoneBook";
 
 void write_phonenumber(field_phone *phone)
@@ -84,7 +84,7 @@ int main()
 
     while (true)
     {
-        std::cout << "Введите фамилию: " << std::endl;
+        std::cout << "Р’РІРµРґРёС‚Рµ С„Р°РјРёР»РёСЋ: " << std::endl;
         input_line = read_line();
         if (!*input_line)
             break;
@@ -103,7 +103,7 @@ int main()
 
         if (!found_people_count)
         {
-            std::cout << "Не найдено человека с такой фамилией." << std::endl;
+            std::cout << "РќРµ РЅР°Р№РґРµРЅРѕ С‡РµР»РѕРІРµРєР° СЃ С‚Р°РєРѕР№ С„Р°РјРёР»РёРµР№." << std::endl;
         }
         else if (found_people_count == 1)
         {
@@ -115,7 +115,7 @@ int main()
         }
         else
         {
-            std::cout << "Выберите конкретного человека, введя его номер из списка:" << std::endl;
+            std::cout << "Р’С‹Р±РµСЂРёС‚Рµ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ С‡РµР»РѕРІРµРєР°, РІРІРµРґСЏ РµРіРѕ РЅРѕРјРµСЂ РёР· СЃРїРёСЃРєР°:" << std::endl;
             for (int i = 0; i < found_people_count; i++)
             {
                 fullname = &phonebook[found_people[i]]->FullName;
@@ -128,12 +128,12 @@ int main()
                 input_line = read_line();
                 if (!(target_index = atoi(input_line)))
                 {
-                    std::cout << "Введён неверный тип данных. Введите индекс снова:" << std::endl;
+                    std::cout << "Р’РІРµРґС‘РЅ РЅРµРІРµСЂРЅС‹Р№ С‚РёРї РґР°РЅРЅС‹С…. Р’РІРµРґРёС‚Рµ РёРЅРґРµРєСЃ СЃРЅРѕРІР°:" << std::endl;
                     continue;
                 }
                 else if (target_index < 1 || target_index > found_people_count)
                 {
-                    std::cout << "Введён неправильный индекс. Введите индекс снова:" << std::endl;
+                    std::cout << "Р’РІРµРґС‘РЅ РЅРµРїСЂР°РІРёР»СЊРЅС‹Р№ РёРЅРґРµРєСЃ. Р’РІРµРґРёС‚Рµ РёРЅРґРµРєСЃ СЃРЅРѕРІР°:" << std::endl;
                     continue;
                 }
                 break;
