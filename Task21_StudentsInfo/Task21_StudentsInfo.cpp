@@ -1,3 +1,5 @@
+//Лабораторная работа по программированию №7. "Проверка" Вариант №21. Гонцов А.М 1-43
+
 #include <iostream>
 #include <windows.h>
 #include <fstream>
