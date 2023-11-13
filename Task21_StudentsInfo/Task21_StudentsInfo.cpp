@@ -87,12 +87,12 @@ char** strSplit(const char* input_text, const char* separator)
 
 enum Faculties : unsigned char
 {
-    ISCE, // ÈÂÒÔ
-    EF, // İÌÔ
-    HEF, // ÒİÔ
-    FEP, // ÈÔÔ
-    FEM, // ÔİÓ
-    FEE // İİÔ
+    ISCE, // Ğ˜Ğ’Ğ¢Ğ¤
+    EF, // Ğ­ĞœĞ¤
+    HEF, // Ğ¢Ğ­Ğ¤
+    FEP, // Ğ˜Ğ¤Ğ¤
+    FEM, // Ğ¤Ğ­Ğ£
+    FEE // Ğ­Ğ­Ğ¤
 };
 
 enum GraduateDegree : unsigned char
@@ -106,11 +106,11 @@ const short MarkLimits[] = {
 };
 
 const char* NameOfFinalScore[] = {
-        "Íåóäîâë.", "Óäîâë.", "Õîğîøî", "Îòëè÷íî"
+        "ĞĞµÑƒĞ´Ğ¾Ğ²Ğ».", "Ğ£Ğ´Ğ¾Ğ²Ğ».", "Ğ¥Ğ¾Ñ€Ğ¾ÑˆĞ¾", "ĞÑ‚Ğ»Ğ¸Ñ‡Ğ½Ğ¾"
 };
 
 const char* FacultiesNamesRU[] = {
-        "ÈÂÒÔ","İÌÔ","ÒİÔ","ÈÔÔ","ÔİÓ","İİÔ"
+        "Ğ˜Ğ’Ğ¢Ğ¤","Ğ­ĞœĞ¤","Ğ¢Ğ­Ğ¤","Ğ˜Ğ¤Ğ¤","Ğ¤Ğ­Ğ£","Ğ­Ğ­Ğ¤"
 };
 
 typedef struct
@@ -184,7 +184,7 @@ int main()
         }
         if (student->Faculty == (unsigned char)-1)
         {
-            std::cout << "Â ñòğîêå <" << studentsCount + 1 << "> íåâåğíî óêàçàí ôàêóëüòåò" << std::endl;
+            std::cout << "Ğ’ ÑÑ‚Ñ€Ğ¾ĞºĞµ <" << studentsCount + 1 << "> Ğ½ĞµĞ²ĞµÑ€Ğ½Ğ¾ ÑƒĞºĞ°Ğ·Ğ°Ğ½ Ñ„Ğ°ĞºÑƒĞ»ÑŒÑ‚ĞµÑ‚" << std::endl;
             system("pause");
             return 0;
         }
@@ -192,7 +192,7 @@ int main()
         student->Course = atoi(lineSplit[4]);
         student->Group = atoi(lineSplit[5]);
 
-        if ((unsigned char)lineSplit[5][_msize(lineSplit[5]) - 2] == 236) // 236 = ì
+        if ((unsigned char)lineSplit[5][_msize(lineSplit[5]) - 2] == 236) // 236 = Ğ¼
         {
             student->Degree = Master;
         }
@@ -230,25 +230,25 @@ int main()
     {
         auto student = studentsList[i];
         std::cout << i + 1 << "." << std::endl;
-        std::cout << " ÔÈÎ: " << student->FullName.Surname << ' ' << *student->FullName.Name << ". " << *student->FullName.DadSurname << '.' << std::endl;
-        std::cout << " Ôàêóëüòåò: " << FacultiesNamesRU[student->Faculty] << std::endl;
-        std::cout << " Ãğóïïà: " << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
+        std::cout << " Ğ¤Ğ˜Ğ: " << student->FullName.Surname << ' ' << *student->FullName.Name << ". " << *student->FullName.DadSurname << '.' << std::endl;
+        std::cout << " Ğ¤Ğ°ĞºÑƒĞ»ÑŒÑ‚ĞµÑ‚: " << FacultiesNamesRU[student->Faculty] << std::endl;
+        std::cout << " Ğ“Ñ€ÑƒĞ¿Ğ¿Ğ°: " << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
         if (student->Degree == Master)
-            std::cout << "ì";
+            std::cout << "Ğ¼";
 
         std::cout << std::endl;
-        std::cout << " Îöåíêà çà ıêçàìåí: " << student->Controls.Exam << std::endl;
-        const char* ratingStr = " Ğåéòèíã: ";
+        std::cout << " ĞÑ†ĞµĞ½ĞºĞ° Ğ·Ğ° ÑĞºĞ·Ğ°Ğ¼ĞµĞ½: " << student->Controls.Exam << std::endl;
+        const char* ratingStr = " Ğ ĞµĞ¹Ñ‚Ğ¸Ğ½Ğ³: ";
         const char* ratingSpace = "     ";
         std::cout << ratingStr << std::endl;
         for (int j = 0; j < 4; j++)
         {
-            const char* controlName = j % 2 ? "ÏÊ" : "ÒÊ";
+            const char* controlName = j % 2 ? "ĞŸĞš" : "Ğ¢Ğš";
             std::cout << ratingSpace << controlName << (j < 2 ? 1 : 2) << ": " << *((float*)&student->Controls + j) << std::endl;
         }
 
         auto totalScore = GetTotalRITM(student);
-        std::cout << " ÑÈ: " << totalScore << std::endl; // ÑÈ - Ñóììàğíûé Èíäåêñ
+        std::cout << " Ğ¡Ğ˜: " << totalScore << std::endl; // Ğ¡Ğ˜ - Ğ¡ÑƒĞ¼Ğ¼Ğ°Ñ€Ğ½Ñ‹Ğ¹ Ğ˜Ğ½Ğ´ĞµĞºÑ
         char* finalScore = 0;
         for (int j = 0; j < sizeof(MarkLimits) / sizeof(short); j++)
         {
@@ -258,7 +258,7 @@ int main()
                 break;
             }
         }
-        std::cout << " Èòîãîâûé áàëë: " << finalScore << std::endl;
+        std::cout << " Ğ˜Ñ‚Ğ¾Ğ³Ğ¾Ğ²Ñ‹Ğ¹ Ğ±Ğ°Ğ»Ğ»: " << finalScore << std::endl;
     }
     system("pause");
     return 0;
