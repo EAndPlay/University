@@ -1,100 +1,30 @@
-//Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ СЂР°Р±РѕС‚Р° РїРѕ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЋ в„–7. "РџСЂРѕРІРµСЂРєР°" Р’Р°СЂРёР°РЅС‚ в„–21. Р“РѕРЅС†РѕРІ Рђ.Рњ 1-43
+//Лабораторная работа по программированию №7. "Проверка" Вариант №21. Гонцов А.М 1-43
 
 #include <iostream>
 #include <windows.h>
 #include <fstream>
+#include <vector>
+#include <locale>
 
 #include <cstring>
 
-char* ReadLine()
+#include "StringExtensions.h"
+
+#define MAX_FILE_PATH 255
+
+enum MenuId : unsigned char
 {
-    const int kMaxLineLength = 1024;
-    char* output_line = (char*)malloc(kMaxLineLength);
-    memset(output_line, 0, kMaxLineLength);
-    gets_s(output_line, kMaxLineLength);
-    return output_line;
-}
-
-int strFindIndex(const char* inputText, const char* value)
-{
-    int text_length = strlen(inputText);
-    int value_length = strlen(value);
-
-    for (int i = 0; i < text_length - value_length; i++)
-    {
-        if (inputText[i] == value[0])
-        {
-            for (int j = 1; j < value_length; j++)
-            {
-                if (inputText[i + j + 1] != value[j])
-                    goto IContinue;
-            }
-            return i;
-        }
-    IContinue:
-        continue;
-    }
-    return -1;
-}
-
-char** strSplit(const char* input_text, const char* separator)
-{
-    char** split_array = (char**)malloc(sizeof(size_t));
-    int split_count = 0;
-    int text_length = strlen(input_text);
-    int separator_length = strlen(separator);
-    int actual_length = text_length - separator_length;
-
-    int i = 0;
-    int separator_index = strFindIndex(input_text, separator);
-
-    if (separator_index != -1)
-    {
-        while (true)
-        {
-            split_array = (char**)realloc(split_array, sizeof(size_t) * (split_count + 1));
-
-            int split_length = separator_index - i;
-            char* split_str = (char*)malloc(split_length + 1);
-            split_array[split_count] = split_str;
-            split_count++;
-            memcpy(split_str, input_text + i, split_length);
-            split_str[split_length] = 0;
-
-            i += split_length + separator_length;
-            separator_index = strFindIndex(input_text + i, separator);
-            if (separator_index == -1)
-                break;
-            separator_index += i;
-        }
-    }
-
-    if (split_count && i < text_length)
-    {
-        split_array = (char**)realloc(split_array, sizeof(size_t) * (split_count + 1));
-        int split_length = text_length - i;
-        char* split_str = (char*)malloc(split_length);
-        memcpy(split_str, input_text + i, text_length - i + 1);
-        split_str[split_length] = 0;
-        split_array[split_count] = split_str;
-        split_count++;
-    }
-    else if (!split_count)
-    {
-        *split_array = (char*)input_text;
-    }
-
-    return split_array;
-}
+    Main,
+};
 
 enum Faculties : unsigned char
 {
-    ISCE, // РР’РўР¤
-    EF, // Р­РњР¤
-    HEF, // РўР­Р¤
-    FEP, // РР¤Р¤
-    FEM, // Р¤Р­РЈ
-    FEE // Р­Р­Р¤
+    ISCE, // ИВТФ
+    EF, // ЭМФ
+    HEF, // ТЭФ
+    FEP, // ИФФ
+    FEM, // ФЭУ
+    FEE // ЭЭФ
 };
 
 enum GraduateDegree : unsigned char
@@ -108,20 +38,21 @@ const short MarkLimits[] = {
 };
 
 const char* NameOfFinalScore[] = {
-        "РќРµСѓРґРѕРІР».", "РЈРґРѕРІР».", "РҐРѕСЂРѕС€Рѕ", "РћС‚Р»РёС‡РЅРѕ"
+        "Неудовл.", "Удовл.", "Хорошо", "Отлично"
 };
 
 const char* FacultiesNamesRU[] = {
-        "РР’РўР¤","Р­РњР¤","РўР­Р¤","РР¤Р¤","Р¤Р­РЈ","Р­Р­Р¤"
+        "ИВТФ","ЭМФ","ТЭФ","ИФФ","ФЭУ","ЭЭФ"
 };
 
 typedef struct
 {
-    char* Surname;
-    char* Name;
-    char* DadSurname;
+    char Surname[32];
+    char Name[32];
+    char DadSurname[32];
 } FullName;
 
+// TODO: compact every control to 1 byte
 typedef struct
 {
     //CC - Current Control
@@ -133,15 +64,15 @@ typedef struct
     float Exam;
 } KnowledgeControls;
 
-
+// Course-Group struct:
 typedef struct
 {
+    int LocalStudentId;
     FullName FullName;
     Faculties Faculty;
     unsigned char Course;
     unsigned char Group;
     GraduateDegree Degree;
-    short CourseGroup;
     KnowledgeControls Controls;
 } Student;
 
@@ -155,113 +86,210 @@ int GetTotalRITM(Student* student)
 }
 
 const int kLineBufferSize = 1023;
-const int kSymbolsTable = 1'251;
+const int kSymbolsTable = 1251;
 
-const char* kDBFilePath = "Z:\\Development\\University\\Debug\\StudentsInfo";
+const char kDBFilePath[MAX_FILE_PATH] = "Z:\\Development\\University\\Debug\\StudentsInfo.bin";
+
+void HandleMenuAction(int currentMenu, int action);
+
+typedef struct
+{
+    char* Description;
+    void(*OnHandle)();
+} MenuAction;
+
+typedef struct tagMenu
+{
+    tagMenu *ParentMenu;
+    std::vector<MenuAction> Actions;
+    void OnShowMenu()
+    {
+        for (int i = 0; i < this->Actions.size(); i++)
+        {
+            std::cout << i + 1 << ": " << this->Actions[i].Description << std::endl;
+        }
+        int actionId;
+        while (true)
+        {
+            std::cout << "Действие: ";
+            std::cin >> actionId;
+            if (std::cin.fail())
+            {
+                std::cin.clear();
+                std::cout << "Должно быть введено число!" << std::endl;
+                continue;
+            }
+            if (actionId < 1 || actionId > this->Actions.size() - 1)
+            {
+                std::cout << "Неверный номер действия." << std::endl;
+                continue;
+            }
+            break;
+        }
+        this->Actions[actionId - 1].OnHandle();
+    }
+} IMenu;
+
+static IMenu *MainMenu;
+static IMenu *FindEditMenu;
+static IMenu *CurrentMenu;
+
+static std::vector<Student> StudentsList;
+static std::ifstream DBFileStream;
+
+void OnShowMenuDefault(IMenu*);
+void OutputStudentInfo(Student*);
+
+void InitializeMenus();
+void SwitchMenu(IMenu*);
 
 int main()
 {
-    SetConsoleCP(kSymbolsTable);
-    SetConsoleOutputCP(kSymbolsTable);
-    std::ifstream sourceFileStream(kDBFilePath, std::ios_base::in);
+    //SetConsoleCP(kSymbolsTable);
+    //SetConsoleOutputCP(kSymbolsTable);
+    setlocale(LC_ALL, "ru");
+    InitializeMenus();
+    MainMenu->OnShowMenu();
+    return 0;
+    //DBFileStream(kDBFilePath, std::ios_base::in);
 
-    auto studentsList = (Student**)malloc(1);
-    auto studentsCount = 0;
-
-    char* lineBuffer = (char*)malloc(kLineBufferSize + 1);
-    memset(lineBuffer, 0, kLineBufferSize);
-
-    while (sourceFileStream.getline(lineBuffer, kLineBufferSize))
+    while (DBFileStream.peek() != EOF)
     {
-        const int kMaxSplits = 11;
-        char** lineSplit = strSplit(lineBuffer, " ");
-        const auto student = (Student*)malloc(sizeof(Student));
-        memcpy(student, lineSplit, sizeof(FullName));
-
-        student->Faculty = (Faculties)-1;
-        for (int i = 0; i < sizeof(FacultiesNamesRU) / sizeof(size_t); i++)
-        {
-            if (!strcmp(FacultiesNamesRU[i], lineSplit[3]))
-                student->Faculty = (Faculties)i;
-        }
-        if (student->Faculty == (unsigned char)-1)
-        {
-            std::cout << "Р’ СЃС‚СЂРѕРєРµ <" << studentsCount + 1 << "> РЅРµРІРµСЂРЅРѕ СѓРєР°Р·Р°РЅ С„Р°РєСѓР»СЊС‚РµС‚" << std::endl;
-            system("pause");
-            return 0;
-        }
-
-        student->Course = atoi(lineSplit[4]);
-        student->Group = atoi(lineSplit[5]);
-
-        if ((unsigned char)lineSplit[5][_msize(lineSplit[5]) - 2] == 236) // 236 = Рј
-        {
-            student->Degree = Master;
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            *((float*)&student->Controls + i) = atof(lineSplit[6 + i]);
-        }
-
-        for (int i = 3; i < kMaxSplits - 1; i++)
-            free(lineSplit[i]);
-        free(lineSplit);
-
-        studentsList = (Student**)realloc(studentsList, (studentsCount + 1) * sizeof(size_t));
-        bool added = false;
-        for (int i = 0; i < studentsCount; i++)
-        {
-            auto readyStudent = studentsList[i];
-            if (GetTotalRITM(student) > GetTotalRITM(readyStudent))
-            {
-                memmove(studentsList + i + 1, studentsList + i, (studentsCount - i) * sizeof(size_t));
-                studentsList[i] = student;
-                added = true;
-                break;
-            }
-        }
-        if (!added)
-            studentsList[studentsCount] = student;
-        studentsCount++;
+        Student student;
+        DBFileStream.read((char *)&student, sizeof(Student));
+        StudentsList.push_back(student);
     }
-    free(lineBuffer);
-    sourceFileStream.close();
-
-    for (int i = 0; i < studentsCount; ++i)
-    {
-        auto student = studentsList[i];
-        std::cout << i + 1 << "." << std::endl;
-        std::cout << " Р¤РРћ: " << student->FullName.Surname << ' ' << *student->FullName.Name << ". " << *student->FullName.DadSurname << '.' << std::endl;
-        std::cout << " Р¤Р°РєСѓР»СЊС‚РµС‚: " << FacultiesNamesRU[student->Faculty] << std::endl;
-        std::cout << " Р“СЂСѓРїРїР°: " << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
-        if (student->Degree == Master)
-            std::cout << "Рј";
-
-        std::cout << std::endl;
-        std::cout << " РћС†РµРЅРєР° Р·Р° СЌРєР·Р°РјРµРЅ: " << student->Controls.Exam << std::endl;
-        const char* ratingStr = " Р РµР№С‚РёРЅРі: ";
-        const char* ratingSpace = "     ";
-        std::cout << ratingStr << std::endl;
-        for (int j = 0; j < 4; j++)
-        {
-            const char* controlName = j % 2 ? "РџРљ" : "РўРљ";
-            std::cout << ratingSpace << controlName << (j < 2 ? 1 : 2) << ": " << *((float*)&student->Controls + j) << std::endl;
-        }
-
-        auto totalScore = GetTotalRITM(student);
-        std::cout << " РЎР: " << totalScore << std::endl; // РЎР - РЎСѓРјРјР°СЂРЅС‹Р№ РРЅРґРµРєСЃ
-        char* finalScore = 0;
-        for (int j = 0; j < sizeof(MarkLimits) / sizeof(short); j++)
-        {
-            if (totalScore < MarkLimits[j])
-            {
-                finalScore = (char*)NameOfFinalScore[j];
-                break;
-            }
-        }
-        std::cout << " РС‚РѕРіРѕРІС‹Р№ Р±Р°Р»Р»: " << finalScore << std::endl;
-    }
+    
     system("pause");
     return 0;
+}
+
+void InitializeMenus()
+{
+    MainMenu = new IMenu();
+    FindEditMenu = new IMenu();
+    MainMenu->ParentMenu = nullptr;
+    FindEditMenu->ParentMenu = MainMenu;
+
+    // MainMenu
+    {
+        MenuAction outPutAll =
+        {
+            const_cast<char*>("Вывести всех"),
+            []()
+            {
+                for (auto& student : StudentsList)
+                {
+                    OutputStudentInfo(&student);
+                    std::cout << std::endl;
+                }
+            }
+        };
+        MenuAction switchToFindEdit =
+        {
+            const_cast<char*>("Поиск и редактирование"),
+            []()
+            {
+                SwitchMenu(FindEditMenu);
+            }
+        };
+        MenuAction exitApp =
+        {
+            const_cast<char*>("Завершить"),
+            []()
+            {
+                exit(0);
+            }
+        };
+        MainMenu->Actions = *new std::vector<MenuAction>();
+        MainMenu->Actions.push_back(outPutAll);
+        MainMenu->Actions.push_back(switchToFindEdit);
+        MainMenu->Actions.push_back(exitApp);
+    }
+    // MainMenu
+
+    auto actionSwitchBack = *new MenuAction();
+    actionSwitchBack.Description = const_cast<char*>("Назад");
+    actionSwitchBack.OnHandle = []()
+    {
+        if (CurrentMenu->ParentMenu)
+        {
+            SwitchMenu(CurrentMenu->ParentMenu);
+        }
+    };
+
+    // FindEditMenu
+    {
+
+        FindEditMenu->Actions = *new std::vector<MenuAction>();
+        FindEditMenu->Actions.push_back(actionSwitchBack);
+    }
+    // FindEditMenu
+
+}
+
+void SwitchMenu(IMenu* newMenu)
+{
+    CurrentMenu = newMenu;
+    CurrentMenu->OnShowMenu();
+}
+
+void OutputStudentInfo(Student* student)
+{
+    std::cout << " ФИО: " << student->FullName.Surname << ' ' << *student->FullName.Name << ". " << *student->FullName.DadSurname << '.' << std::endl;
+    std::cout << " Факультет: " << FacultiesNamesRU[student->Faculty] << std::endl;
+    std::cout << " Группа: " << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
+    if (student->Degree == Master)
+        std::cout << "м";
+
+    std::cout << std::endl;
+    std::cout << " Оценка за экзамен: " << student->Controls.Exam << std::endl;
+    const char* ratingStr = " Рейтинг: ";
+    const char* ratingSpace = "     ";
+    std::cout << ratingStr << std::endl;
+    for (int j = 0; j < 4; j++)
+    {
+        const char* controlName = j % 2 ? "ПК" : "ТК";
+        std::cout << ratingSpace << controlName << (j < 2 ? 1 : 2) << ": " << *((float*)&student->Controls + j) << std::endl;
+    }
+
+    auto totalScore = GetTotalRITM(student);
+    std::cout << " СИ: " << totalScore << std::endl; // СИ - Суммарный Индекс
+    char* finalScore = 0;
+    for (int j = 0; j < sizeof(MarkLimits) / sizeof(short); j++)
+    {
+        if (totalScore < MarkLimits[j])
+        {
+            finalScore = (char*)NameOfFinalScore[j];
+            break;
+        }
+    }
+    std::cout << " Итоговый балл: " << finalScore << std::endl;
+}
+
+void OnShowMenuDefault(IMenu* menu)
+{
+    for (int i = 0; i < menu->Actions.size(); i++)
+    {
+        std::cout << i + 1 << ": " << menu->Actions[i].Description << std::endl;
+    }
+    int actionId;
+    while (true)
+    {
+        std::cout << "Действие: ";
+        std::cin >> actionId;
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cout << "Должно быть введено число!" << std::endl;
+            continue;
+        }
+        if (actionId < 1 || actionId - 1 > menu->Actions.size())
+        {
+            std::cout << ":" << actionId << "Неверный номер действия." << std::endl;
+            continue;
+        }
+        break;
+    }
+    menu->Actions[actionId - 1].OnHandle();
 }
