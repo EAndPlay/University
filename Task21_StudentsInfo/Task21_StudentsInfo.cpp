@@ -1,4 +1,4 @@
-//Лабораторная работа по программированию №7. "Проверка" Вариант №21. Гонцов А.М 1-43
+п»ї//Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ СЂР°Р±РѕС‚Р° РїРѕ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЋ в„–7. "РџСЂРѕРІРµСЂРєР°" Р’Р°СЂРёР°РЅС‚ в„–21. Р“РѕРЅС†РѕРІ Рђ.Рњ 1-43
 
 #include <iostream>
 #include <windows.h>
@@ -19,12 +19,12 @@ enum MenuId : unsigned char
 
 enum Faculties : unsigned char
 {
-    ISCE, // ИВТФ
-    EF, // ЭМФ
-    HEF, // ТЭФ
-    FEP, // ИФФ
-    FEM, // ФЭУ
-    FEE // ЭЭФ
+    ISCE, // РР’РўР¤
+    EF, // Р­РњР¤
+    HEF, // РўР­Р¤
+    FEP, // РР¤Р¤
+    FEM, // Р¤Р­РЈ
+    FEE // Р­Р­Р¤
 };
 
 enum GraduateDegree : unsigned char
@@ -38,11 +38,11 @@ const short MarkLimits[] = {
 };
 
 const char* NameOfFinalScore[] = {
-        "Неудовл.", "Удовл.", "Хорошо", "Отлично"
+        "РќРµСѓРґРѕРІР».", "РЈРґРѕРІР».", "РҐРѕСЂРѕС€Рѕ", "РћС‚Р»РёС‡РЅРѕ"
 };
 
 const char* FacultiesNamesRU[] = {
-        "ИВТФ","ЭМФ","ТЭФ","ИФФ","ФЭУ","ЭЭФ"
+        "РР’РўР¤","Р­РњР¤","РўР­Р¤","РР¤Р¤","Р¤Р­РЈ","Р­Р­Р¤"
 };
 
 typedef struct
@@ -111,17 +111,17 @@ typedef struct tagMenu
         int actionId;
         while (true)
         {
-            std::cout << "Действие: ";
+            std::cout << "Р”РµР№СЃС‚РІРёРµ: ";
             std::cin >> actionId;
             if (std::cin.fail())
             {
                 std::cin.clear();
-                std::cout << "Должно быть введено число!" << std::endl;
+                std::cout << "Р”РѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІРІРµРґРµРЅРѕ С‡РёСЃР»Рѕ!" << std::endl;
                 continue;
             }
             if (actionId < 1 || actionId > this->Actions.size() - 1)
             {
-                std::cout << "Неверный номер действия." << std::endl;
+                std::cout << "РќРµРІРµСЂРЅС‹Р№ РЅРѕРјРµСЂ РґРµР№СЃС‚РІРёСЏ." << std::endl;
                 continue;
             }
             break;
@@ -175,7 +175,7 @@ void InitializeMenus()
     {
         MenuAction outPutAll =
         {
-            const_cast<char*>("Вывести всех"),
+            const_cast<char*>("Р’С‹РІРµСЃС‚Рё РІСЃРµС…"),
             []()
             {
                 for (auto& student : StudentsList)
@@ -187,7 +187,7 @@ void InitializeMenus()
         };
         MenuAction switchToFindEdit =
         {
-            const_cast<char*>("Поиск и редактирование"),
+            const_cast<char*>("РџРѕРёСЃРє Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ"),
             []()
             {
                 SwitchMenu(FindEditMenu);
@@ -195,7 +195,7 @@ void InitializeMenus()
         };
         MenuAction exitApp =
         {
-            const_cast<char*>("Завершить"),
+            const_cast<char*>("Р—Р°РІРµСЂС€РёС‚СЊ"),
             []()
             {
                 exit(0);
@@ -209,7 +209,7 @@ void InitializeMenus()
     // MainMenu
 
     auto actionSwitchBack = *new MenuAction();
-    actionSwitchBack.Description = const_cast<char*>("Назад");
+    actionSwitchBack.Description = const_cast<char*>("РќР°Р·Р°Рґ");
     actionSwitchBack.OnHandle = []()
     {
         if (CurrentMenu->ParentMenu)
@@ -236,25 +236,25 @@ void SwitchMenu(IMenu* newMenu)
 
 void OutputStudentInfo(Student* student)
 {
-    std::cout << " ФИО: " << student->FullName.Surname << ' ' << *student->FullName.Name << ". " << *student->FullName.DadSurname << '.' << std::endl;
-    std::cout << " Факультет: " << FacultiesNamesRU[student->Faculty] << std::endl;
-    std::cout << " Группа: " << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
+    std::cout << " Р¤РРћ: " << student->FullName.Surname << ' ' << *student->FullName.Name << ". " << *student->FullName.DadSurname << '.' << std::endl;
+    std::cout << " Р¤Р°РєСѓР»СЊС‚РµС‚: " << FacultiesNamesRU[student->Faculty] << std::endl;
+    std::cout << " Р“СЂСѓРїРїР°: " << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
     if (student->Degree == Master)
-        std::cout << "м";
+        std::cout << "Рј";
 
     std::cout << std::endl;
-    std::cout << " Оценка за экзамен: " << student->Controls.Exam << std::endl;
-    const char* ratingStr = " Рейтинг: ";
+    std::cout << " РћС†РµРЅРєР° Р·Р° СЌРєР·Р°РјРµРЅ: " << student->Controls.Exam << std::endl;
+    const char* ratingStr = " Р РµР№С‚РёРЅРі: ";
     const char* ratingSpace = "     ";
     std::cout << ratingStr << std::endl;
     for (int j = 0; j < 4; j++)
     {
-        const char* controlName = j % 2 ? "ПК" : "ТК";
+        const char* controlName = j % 2 ? "РџРљ" : "РўРљ";
         std::cout << ratingSpace << controlName << (j < 2 ? 1 : 2) << ": " << *((float*)&student->Controls + j) << std::endl;
     }
 
     auto totalScore = GetTotalRITM(student);
-    std::cout << " СИ: " << totalScore << std::endl; // СИ - Суммарный Индекс
+    std::cout << " РЎР: " << totalScore << std::endl; // РЎР - РЎСѓРјРјР°СЂРЅС‹Р№ РРЅРґРµРєСЃ
     char* finalScore = 0;
     for (int j = 0; j < sizeof(MarkLimits) / sizeof(short); j++)
     {
@@ -264,7 +264,7 @@ void OutputStudentInfo(Student* student)
             break;
         }
     }
-    std::cout << " Итоговый балл: " << finalScore << std::endl;
+    std::cout << " РС‚РѕРіРѕРІС‹Р№ Р±Р°Р»Р»: " << finalScore << std::endl;
 }
 
 void OnShowMenuDefault(IMenu* menu)
@@ -276,17 +276,17 @@ void OnShowMenuDefault(IMenu* menu)
     int actionId;
     while (true)
     {
-        std::cout << "Действие: ";
+        std::cout << "Р”РµР№СЃС‚РІРёРµ: ";
         std::cin >> actionId;
         if (std::cin.fail())
         {
             std::cin.clear();
-            std::cout << "Должно быть введено число!" << std::endl;
+            std::cout << "Р”РѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІРІРµРґРµРЅРѕ С‡РёСЃР»Рѕ!" << std::endl;
             continue;
         }
         if (actionId < 1 || actionId - 1 > menu->Actions.size())
         {
-            std::cout << ":" << actionId << "Неверный номер действия." << std::endl;
+            std::cout << ":" << actionId << "РќРµРІРµСЂРЅС‹Р№ РЅРѕРјРµСЂ РґРµР№СЃС‚РІРёСЏ." << std::endl;
             continue;
         }
         break;
