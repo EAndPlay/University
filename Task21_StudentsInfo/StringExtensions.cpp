@@ -31,10 +31,10 @@ int strFindIndex(const char* inputText, const char* value)
     return -1;
 }
 
-char** strSplit(const char* input_text, const char* separator)
+char** strSplit(const char* input_text, const char* separator, int& split_count)
 {
     char** split_array = (char**)malloc(sizeof(size_t));
-    int split_count = 0;
+    split_count = 0;
     int text_length = strlen(input_text);
     int separator_length = strlen(separator);
     int actual_length = text_length - separator_length;
@@ -75,8 +75,27 @@ char** strSplit(const char* input_text, const char* separator)
     }
     else if (!split_count)
     {
-        *split_array = (char*)input_text;
+        free(split_array);
+        return nullptr;
     }
 
     return split_array;
+}
+
+char strcmpic(const char* str1, const char* str2)
+{
+    size_t str1_length = strlen(str1);
+    size_t str2_length = strlen(str2);
+    if (str1_length < str2_length)
+        return -1;
+    else if (str2_length < str1_length)
+        return 1;
+
+    for (int i = 0; i < str2_length; i++)
+    {
+        if ((str1[i] | 0b00100000) != (str2[i] | 0b00100000))
+            return 2;
+    }
+
+    return 0;
 }

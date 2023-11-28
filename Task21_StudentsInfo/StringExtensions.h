@@ -4,7 +4,10 @@
 char* ReadLine();
 
 // Returns index of "value" in "inputText"
-int strFindIndex(const char* inputText, const char* value);
+int strFindIndex(const char*, const char*);
 
 // Returns array of splitted strings
-char** strSplit(const char* input_text, const char* separator);
+char** strSplit(const char*, const char*, int&);
+
+//Compares string ignoring register case (ic)
+char strcmpic(const char*, const char*);
