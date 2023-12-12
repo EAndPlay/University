@@ -221,17 +221,15 @@ void ChangeStudentProperty(EStudentProperty property)
         if (splitCount != 3)
         {
             free(snd);
-            for (int i = 0; i < _msize(sndSplit) / sizeof(size_t); i++)
-                free(sndSplit[i]);
-            free(sndSplit);
-            cin.ignore();
+            if (sndSplit)
+            {
+                for (int i = 0; i < _msize(sndSplit) / sizeof(size_t); i++)
+                    free(sndSplit[i]);
+                free(sndSplit);
+            }
             cout << InvalidInputTypeException << endl;
             SwitchMenu(CurrentMenu->ParentMenu);
             return;
-        }
-        for (int i = 0; i < 3; i++)
-        {
-            cout << i << ": " << sndSplit[i] << endl;
         }
         ActionToConfirm = []
         {
@@ -247,7 +245,7 @@ void ChangeStudentProperty(EStudentProperty property)
             free(snd);
             UpdateDBFile();
         };
-        SwitchMenu(ConfirmMenu, MainMenu);
+        SwitchMenu(ConfirmMenu, FindEditMenu);
         break;
     }
     case Marks:
@@ -854,5 +852,6 @@ void UpdateDBFile()
     {
         DBFileStreamWrite.write((char*)&StudentsList[i], sizeof(Student));
     }
+    //DBFileStreamWrite.write((char*)&StudentsList, sizeof(Student) * StudentsList.size());
     DBFileStreamWrite.close();
 }
