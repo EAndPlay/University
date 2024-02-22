@@ -1,4 +1,4 @@
-﻿//Лабораторная работа по программированию №7. "Проверка" Вариант №21. Гонцов А.М 1-43
+//Лабораторная работа по программированию №7. "Проверка" Вариант №21. Гонцов А.М 1-43
 
 #include <iostream>
 #include <windows.h>
@@ -119,7 +119,7 @@ typedef struct tagMenu
     void (*ActionCompleted)() = nullptr;
     void __thiscall BaseOnShow()
     {
-        cout << Caption << endl;
+        cout << endl << Caption << endl;
         for (int i = 0; i < this->Actions.size(); i++)
         {
             cout << i + 1 << ": " << this->Actions[i].Description << endl;
@@ -223,8 +223,8 @@ void ChangeStudentProperty(EStudentProperty property)
             free(snd);
             if (sndSplit)
             {
-                for (int i = 0; i < _msize(sndSplit) / sizeof(size_t); i++)
-                    free(sndSplit[i]);
+                //for (int i = 0; i < splitCount; i++)
+                //    free(sndSplit[i]);
                 free(sndSplit);
             }
             cout << InvalidInputTypeException << endl;
@@ -237,7 +237,7 @@ void ChangeStudentProperty(EStudentProperty property)
             for (char i = 0; i < 3; i++)
             {
                 memcpy((char*)(&TargetStudent->FullName.Surname) + kMaxStringLength * i, sndSplit[i], strlen(sndSplit[i]));
-                cout << i << endl;
+                //cout << i << endl;
                 //if (sndSplit[i])
                 //    free(sndSplit[i]);
             }
