@@ -10,16 +10,14 @@
 
 using std::cout, std::cin, std::endl, std::vector, std::string, std::fstream;
 
-typedef float MarkType;
-
-enum EStudentProperty : byte
+enum class EStudentProperty : byte
 {
     SND,
     Marks,
     FCG // Faculty Course Group
 };
 
-enum EFaculties : byte
+enum class EFaculties : byte
 {
     ISCE = 1, // ИВТФ
     EF = 2, // ЭМФ
@@ -29,7 +27,7 @@ enum EFaculties : byte
     FEE = 6 // ЭЭФ
 };
 
-enum EGraduateDegree : byte
+enum class EGraduateDegree : byte
 {
     Bachelor,
     Master,
@@ -60,7 +58,7 @@ typedef struct
     char DadSurname[kMaxStringLength];
 } FullName;
 
-// TODO: compact every control to 1 byte
+typedef float MarkType;
 typedef struct
 {
     //CC - Current Control
@@ -72,7 +70,6 @@ typedef struct
     MarkType Exam;
 } KnowledgeControls;
 
-// Course-Group struct:
 typedef struct student_t
 {
     int LocalStudentId;
@@ -129,6 +126,7 @@ typedef struct tagMenu
         {
             cout << "Действие: ";
             cin >> actionId;
+            cout << endl;
             if (cin.fail())
             {
                 cin.clear();
@@ -174,10 +172,14 @@ const int FileReadWriteRecreateFlags = FileReadWriteFlags | std::ios_base::trunc
 
 void UpdateDBFile();
 vector<Student> GetSortedStudentsList(bool(*)(const Student&, const Student&));
-void OutputStudentInfo(Student*);
-void SwitchMenu(IMenu*, IMenu* = nullptr);
+void __fastcall OutputStudentInfo(Student*);
+void __fastcall SwitchMenu(IMenu*, IMenu* = nullptr);
 void InitializeMenus();
 void ChangeStudentProperty(EStudentProperty);
+inline void LeaveMenu()
+{
+    SwitchMenu(CurrentMenu->ParentMenu);
+}
 
 int main()
 {
@@ -187,12 +189,11 @@ int main()
     DBFileStreamRead.open(kDBFilePath, FileReadWriteFlags);
     if (!DBFileStreamRead)
     {
-        //DBFileStream.open(kDBFilePath, FileReadWriteRecreateFlags);
         cout << "Файл не существовал, поэтому был создан пустой файл." << endl << endl;
     }
     while (DBFileStreamRead.peek() != EOF)
     {
-        Student student;
+        Student student{};
         DBFileStreamRead.read((char*)&student, sizeof(Student));
         StudentsList.push_back(student);
     }
@@ -212,8 +213,14 @@ void ChangeStudentProperty(EStudentProperty property)
     ChoiceToChange = property;
     switch (property)
     {
-    case SND: {
+    case EStudentProperty::SND:
+    {
         cout << "ФИО: ";
+        if (*TargetStudent->FullName.Surname)
+            cout << TargetStudent->FullName.Surname << ' ' << TargetStudent->FullName.Name << ' ' << TargetStudent->FullName.DadSurname;
+        else
+            cout << NotAvaibleInfoException;
+        cout << endl << "Новое ФИО: ";
         cin.get();
         snd = ReadLine();
         splitCount = 0;
@@ -228,7 +235,7 @@ void ChangeStudentProperty(EStudentProperty property)
                 free(sndSplit);
             }
             cout << InvalidInputTypeException << endl;
-            SwitchMenu(CurrentMenu->ParentMenu);
+            LeaveMenu();
             return;
         }
         ActionToConfirm = []
@@ -248,12 +255,16 @@ void ChangeStudentProperty(EStudentProperty property)
         SwitchMenu(ConfirmMenu, FindEditMenu);
         break;
     }
-    case Marks:
+    case EStudentProperty::Marks:
+    {
         SwitchMenu(MarksMenu, FindEditMenu);
         break;
-    case FCG:
+    }
+    case EStudentProperty::FCG:
+    {
         SwitchMenu(FCGMenu, FindEditMenu);
         break;
+    }
     }
 }
 
@@ -291,16 +302,21 @@ void InitializeMenus()
                 {
                     cout << "Список студентов пуст." << endl;
                 }
-                SwitchMenu(CurrentMenu->ParentMenu);
+                LeaveMenu();
             }
         };
         MenuAction actionRecreate =
         {
-            "Очистить файл",
+            "Очистить файл и данные",
             []
             {
-                DBFileStreamWrite.open(kDBFilePath, std::ios_base::trunc);
-                DBFileStreamWrite.close();
+                ActionToConfirm = []
+                {
+                    DBFileStreamWrite.open(kDBFilePath, std::ios_base::trunc);
+                    DBFileStreamWrite.close();
+                    UpdateDBFile();
+                };
+                SwitchMenu(ConfirmMenu, MainMenu);
             }
         };
         MenuAction switchToFindEdit =
@@ -359,7 +375,7 @@ void InitializeMenus()
                     cin.clear();
                     cin.ignore();
                     cout << InvalidInputTypeException << endl;
-                    SwitchMenu(CurrentMenu->ParentMenu);
+                    LeaveMenu();
                     return;
                 }
                 eraseIndex = -1;
@@ -373,7 +389,7 @@ void InitializeMenus()
                 if (eraseIndex == -1)
                 {
                     cout << NoSuchStudentIdException << endl;
-                    SwitchMenu(CurrentMenu->ParentMenu);
+                    LeaveMenu();
                     return;
                 }
                 ActionToConfirm = []
@@ -401,7 +417,6 @@ void InitializeMenus()
                 exit(0);
             }
         };
-        MainMenu->Actions = *new vector<MenuAction>();
         MainMenu->Actions.push_back(outPutAll);
         MainMenu->Actions.push_back(actionRecreate);
         MainMenu->Actions.push_back(switchToFindEdit);
@@ -418,13 +433,13 @@ void InitializeMenus()
     }
     // MainMenu
 
-    auto actionSwitchBack = *new MenuAction();
+    MenuAction actionSwitchBack;
     actionSwitchBack.Description = "Назад";
     actionSwitchBack.OnHandle = []
     {
         if (CurrentMenu->ParentMenu)
         {
-            SwitchMenu(CurrentMenu->ParentMenu);
+            LeaveMenu();
         }
     };
 
@@ -435,7 +450,7 @@ void InitializeMenus()
             "ФИО",
             []
             {
-                ChangeStudentProperty(SND);
+                ChangeStudentProperty(EStudentProperty::SND);
             }
         };
         MenuAction actionChooseMark =
@@ -443,7 +458,7 @@ void InitializeMenus()
             "Оценка",
             []
             {
-                ChangeStudentProperty(Marks);
+                ChangeStudentProperty(EStudentProperty::Marks);
             }
         };
         MenuAction actionChooseFCG =
@@ -451,10 +466,9 @@ void InitializeMenus()
             "Факультет/Курс/Группа",
             []
             {
-                ChangeStudentProperty(FCG);
+                ChangeStudentProperty(EStudentProperty::FCG);
             }
         };
-        FindEditMenu->Actions = *new vector<MenuAction>();
         FindEditMenu->Actions.push_back(actionChooseSND);
         FindEditMenu->Actions.push_back(actionChooseMark);
         FindEditMenu->Actions.push_back(actionChooseFCG);
@@ -474,7 +488,7 @@ void InitializeMenus()
                 cin.clear();
                 cin.ignore();
                 cout << InvalidInputTypeException << endl;
-                SwitchMenu(CurrentMenu->ParentMenu);
+                LeaveMenu();
                 return;
             }
             TargetStudent = nullptr;
@@ -489,7 +503,7 @@ void InitializeMenus()
             if (!TargetStudent)
             {
                 cout << NoSuchStudentIdException << endl;
-                SwitchMenu(CurrentMenu->ParentMenu);
+                LeaveMenu();
             }
         };
         FindEditMenu->Caption = "Что изменить:";
@@ -512,12 +526,11 @@ void InitializeMenus()
             "Нет",
             nullptr
         };
-        ConfirmMenu->Actions = *new vector<MenuAction>();
         ConfirmMenu->Actions.push_back(actionConfirm);
         ConfirmMenu->Actions.push_back(actionCancel);
         ConfirmMenu->ActionCompleted = []
         {
-            SwitchMenu(CurrentMenu->ParentMenu);
+            LeaveMenu();
             UpdateDBFile();
         };
         ConfirmMenu->Caption = "Вы уверены?";
@@ -526,7 +539,6 @@ void InitializeMenus()
 
     // MarksMenu
     {
-        MarksMenu->Actions = *new vector<MenuAction>();
         MenuAction actionChooseCC1 =
         {
             ControlsNamesRU[0],
@@ -631,7 +643,7 @@ void InitializeMenus()
                             break;
                         }
                     }
-                    if (!TargetStudent->Faculty)
+                    if (!(int)TargetStudent->Faculty)
                     {
                         cout << "Введён несуществующий факультет. Факультет у студента был обнулён." << endl;
                     }
@@ -647,7 +659,7 @@ void InitializeMenus()
                         cin.clear();
                         cin.ignore();
                         cout << InvalidInputTypeException << endl;
-                        SwitchMenu(CurrentMenu->ParentMenu);
+                        LeaveMenu();
                         goto FCGShowReturn;
                     }
                     TargetStudent->Course = atoi(inputSplit[0]);
@@ -656,14 +668,14 @@ void InitializeMenus()
                     {
                     case 'М':
                     case 'м':
-                        TargetStudent->Degree = Master;
+                        TargetStudent->Degree = EGraduateDegree::Master;
                         break;
                     case 'А':
                     case 'а':
-                        TargetStudent->Degree = Postgraduate;
+                        TargetStudent->Degree = EGraduateDegree::Postgraduate;
                         break;
                     default:
-                        TargetStudent->Degree = Bachelor;
+                        TargetStudent->Degree = EGraduateDegree::Bachelor;
                         break;
                     }
 
@@ -679,9 +691,8 @@ void InitializeMenus()
             }
             free(inputLine);
             UpdateDBFile();
-            SwitchMenu(CurrentMenu->ParentMenu);
+            LeaveMenu();
         };
-        FCGMenu->Actions = *new vector<MenuAction>();
         FCGMenu->Actions.push_back(actionFacultyChoice);
         FCGMenu->Actions.push_back(actionCourseGroupChoice);
         //FCGMenu->ActionCompleted = []
@@ -724,7 +735,7 @@ void InitializeMenus()
                 };
             }
         };
-        MenuAction actionSortToHigherId = // FS = Final Score
+        MenuAction actionSortToHigherId
         {
             "По возрастанию ID",
             []
@@ -739,7 +750,6 @@ void InitializeMenus()
                 };
             }
         };
-        SortMenu->Actions = *new vector<MenuAction>();
         SortMenu->Actions.push_back(actionSortToLessFS);
         SortMenu->Actions.push_back(actionSortToHigherFS);
         SortMenu->Actions.push_back(actionSortToHigherId);
@@ -753,7 +763,7 @@ void InitializeMenus()
     //SortMenu
 }
 
-void SwitchMenu(IMenu* newMenu, IMenu* parentMenu)
+void __fastcall SwitchMenu(IMenu* newMenu, IMenu* parentMenu)
 {
     if (parentMenu)
         newMenu->ParentMenu = parentMenu;
@@ -764,7 +774,7 @@ void SwitchMenu(IMenu* newMenu, IMenu* parentMenu)
         CurrentMenu->BaseOnShow();
 }
 
-void OutputStudentInfo(Student* student)
+void __fastcall OutputStudentInfo(Student* student)
 {
     cout << "ID: " << student->LocalStudentId << endl;
     cout << " ФИО: ";
@@ -774,8 +784,8 @@ void OutputStudentInfo(Student* student)
         cout << NotAvaibleInfoException;
     cout << endl;
     cout << " Факультет: ";
-    if (student->Faculty)
-        cout << FacultiesNamesRU[student->Faculty - 1];
+    if ((int)student->Faculty)
+        cout << FacultiesNamesRU[(int)student->Faculty - 1];
     else
         cout << NotAvaibleInfoException;
     cout << endl;
@@ -783,14 +793,14 @@ void OutputStudentInfo(Student* student)
     if (student->Course)
     {
         cout << static_cast<int>(student->Course) << '-' << static_cast<int>(student->Group);
-        if (student->Degree)
+        if ((int)student->Degree)
         {
             switch (student->Degree)
             {
-            case Master:
+            case EGraduateDegree::Master:
                 cout << 'М';
                 break;
-            case Postgraduate:
+            case EGraduateDegree::Postgraduate:
                 cout << 'А';
                 break;
             }
