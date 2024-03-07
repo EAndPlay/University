@@ -34,6 +34,12 @@ enum class EGraduateDegree : byte
     Postgraduate
 };
 
+enum class ESortingType : byte
+{
+    Quick,
+    Merge
+};
+
 const short MarkLimits[] = {
         250, 350, 435, 501 // +1 for <
 };
@@ -172,6 +178,7 @@ const int FileReadWriteRecreateFlags = FileReadWriteFlags | std::ios_base::trunc
 
 void UpdateDBFile();
 vector<Student> GetSortedStudentsList(bool(*)(const Student&, const Student&));
+vector<Student> GetSortedStudentsList(ESortingType);
 void __fastcall OutputStudentInfo(Student*);
 void __fastcall SwitchMenu(IMenu*, IMenu* = nullptr);
 void InitializeMenus();
@@ -181,8 +188,69 @@ inline void LeaveMenu()
     SwitchMenu(CurrentMenu->ParentMenu);
 }
 
+void __fastcall MergeInternaltest(int mas[], int t[], int i, int l, int n)
+{
+    int j = i + 1;
+    int n1 = min(j, n);
+    int n2 = min(j + l, n);
+    int k = i;
+
+    while (i < n1 && j < n2)
+    {
+        if (mas[i] <= mas[j])
+        {
+            t[k++] = mas[i++];
+        }
+        else
+        {
+            t[k++] = mas[j++];
+        }
+    }
+
+    while (i < n1)
+        t[k++] = mas[i++];
+
+    while (j < n2)
+        t[k++] = mas[j++];
+
+
+    for (int i = 0; i < 6; i++)
+    {
+        cout << t[i] << " ";
+    }
+    cout << endl;
+}
+
 int main()
 {
+    int unsorted[] = { 5, 1, 0, 6, 3, 9 };
+    int *temp = new int[6];
+    int startIndex = 1;
+    int i;
+    for (int i = 0; i < 6; i++)
+    {
+        cout << unsorted[i] << " ";
+    }
+    cout << endl;
+    while (startIndex < 6)
+    {
+        for (i = 0; i < 6; i += 2 * startIndex)
+        {
+            MergeInternaltest(unsorted, temp, i, startIndex, 6);
+        }
+        startIndex *= 2;
+        for (i = 0; i < 6; i += 2 * startIndex)
+        {
+            MergeInternaltest(temp, unsorted, i, startIndex, 6);
+        }
+        startIndex *= 2;
+    }
+    for (int i = 0; i < 6; i++)
+    {
+        cout << unsorted[i] << " ";
+    }
+    cout << endl;
+
     SetConsoleCP(kSymbolsTable);
     SetConsoleOutputCP(kSymbolsTable);
     InitializeMenus();
@@ -223,36 +291,44 @@ void ChangeStudentProperty(EStudentProperty property)
         cout << endl << "Новое ФИО: ";
         cin.get();
         snd = ReadLine();
-        splitCount = 0;
-        sndSplit = strSplit(snd, " ", splitCount);
-        if (splitCount != 3)
+        if (strlen(snd))
         {
-            free(snd);
-            if (sndSplit)
+            splitCount = 0;
+            sndSplit = strSplit(snd, " ", splitCount);
+            if (splitCount != 3)
             {
-                //for (int i = 0; i < splitCount; i++)
-                //    free(sndSplit[i]);
+                free(snd);
+                if (sndSplit)
+                {
+                    //for (int i = 0; i < splitCount; i++)
+                    //    free(sndSplit[i]);
+                    free(sndSplit);
+                }
+                cout << InvalidInputTypeException << endl;
+                LeaveMenu();
+                return;
+            }
+            ActionToConfirm = []
+            {
+                memset(&TargetStudent->FullName, 0, sizeof(FullName));
+                for (char i = 0; i < 3; i++)
+                {
+                    memcpy((char*)(&TargetStudent->FullName.Surname) + kMaxStringLength * i, sndSplit[i], strlen(sndSplit[i]));
+                    //cout << i << endl;
+                    //if (sndSplit[i])
+                    //    free(sndSplit[i]);
+                }
                 free(sndSplit);
-            }
-            cout << InvalidInputTypeException << endl;
-            LeaveMenu();
-            return;
+                free(snd);
+                UpdateDBFile();
+            };
+            SwitchMenu(ConfirmMenu, FindEditMenu);
         }
-        ActionToConfirm = []
+        else
         {
-            memset(&TargetStudent->FullName, 0, sizeof(FullName));
-            for (char i = 0; i < 3; i++)
-            {
-                memcpy((char*)(&TargetStudent->FullName.Surname) + kMaxStringLength * i, sndSplit[i], strlen(sndSplit[i]));
-                //cout << i << endl;
-                //if (sndSplit[i])
-                //    free(sndSplit[i]);
-            }
-            free(sndSplit);
-            free(snd);
-            UpdateDBFile();
-        };
-        SwitchMenu(ConfirmMenu, FindEditMenu);
+            cout << "Ввод отменён." << endl << endl;
+            SwitchMenu(FindEditMenu, MainMenu);
+        }
         break;
     }
     case EStudentProperty::Marks:
@@ -475,12 +551,12 @@ void InitializeMenus()
         FindEditMenu->Actions.push_back(actionSwitchBack);
         FindEditMenu->OverrideOnShow = []
         {
-            cout << "ID студента: ";
             if (TargetStudent)
             {
-                cout << TargetStudent->LocalStudentId << endl;
+                OutputStudentInfo(TargetStudent);
                 return;
             }
+            cout << "ID студента: ";
             int studentId;
             cin >> studentId;
             if (cin.fail())
@@ -584,8 +660,10 @@ void InitializeMenus()
         MarksMenu->Actions.push_back(actionChooseCC2);
         MarksMenu->Actions.push_back(actionChooseIC2);
         MarksMenu->Actions.push_back(actionChooseExam);
+        MarksMenu->Actions.push_back(actionSwitchBack);
         MarksMenu->ActionCompleted = []
         {
+            cout << ControlsNamesRU[markIndex] << ": " << *(&TargetStudent->Controls.CC1 + markIndex) << endl;
             cout << "Новый " << ControlsNamesRU[markIndex] << ": ";
             MarkType newMark;
             cin >> newMark;
@@ -594,12 +672,12 @@ void InitializeMenus()
                 cin.clear();
                 cin.ignore();
                 cout << InvalidInputTypeException << endl;
-                SwitchMenu(MainMenu);
+                SwitchMenu(MarksMenu);
                 return;
             }
             *(&TargetStudent->Controls.CC1 + markIndex) = newMark;
             UpdateDBFile();
-            SwitchMenu(MainMenu);
+            SwitchMenu(MarksMenu);
         };
         MarksMenu->ParentMenu = FindEditMenu;
         MarksMenu->Caption = "Оценка для изменения:";
@@ -695,6 +773,7 @@ void InitializeMenus()
         };
         FCGMenu->Actions.push_back(actionFacultyChoice);
         FCGMenu->Actions.push_back(actionCourseGroupChoice);
+        FCGMenu->Actions.push_back(actionSwitchBack);
         //FCGMenu->ActionCompleted = []
         //{
         //    UpdateDBFile();
@@ -707,7 +786,7 @@ void InitializeMenus()
     {
         MenuAction actionSortToLessFS = // FS = Final Score
         {
-            "По убыванию ИС",
+            "По убыванию СИ",
             []
             {
                 ActionToConfirm = []
@@ -722,7 +801,7 @@ void InitializeMenus()
         };
         MenuAction actionSortToHigherFS = // FS = Final Score
         {
-            "По возрастанию ИС",
+            "По возрастанию СИ",
             []
             {
                 ActionToConfirm = []
@@ -750,9 +829,36 @@ void InitializeMenus()
                 };
             }
         };
+        MenuAction actionSortToHigherFS_Quick =
+        {
+            "По возрастанию СИ (быстрая)",
+            []
+            {
+                ActionToConfirm = []
+                {
+                    StudentsList = GetSortedStudentsList(ESortingType::Quick);
+                    UpdateDBFile();
+                };
+            }
+        };
+        MenuAction actionSortToHigherFS_Merge = // FS = Final Score
+        {
+            "По возрастанию СИ (слиянием)",
+            []
+            {
+                ActionToConfirm = []
+                {
+                    StudentsList = GetSortedStudentsList(ESortingType::Merge);
+                    UpdateDBFile();
+                };
+            }
+        };
         SortMenu->Actions.push_back(actionSortToLessFS);
         SortMenu->Actions.push_back(actionSortToHigherFS);
         SortMenu->Actions.push_back(actionSortToHigherId);
+        SortMenu->Actions.push_back(actionSortToHigherFS_Quick);
+        SortMenu->Actions.push_back(actionSortToHigherFS_Merge);
+        SortMenu->Actions.push_back(actionSwitchBack);
         SortMenu->ActionCompleted = []
         {
             SwitchMenu(ConfirmMenu, MainMenu);
@@ -760,7 +866,7 @@ void InitializeMenus()
         SortMenu->Caption = "Метод сортировки:";
         SortMenu->ParentMenu = MainMenu;
     }
-    //SortMenu
+    // SortMenu
 }
 
 void __fastcall SwitchMenu(IMenu* newMenu, IMenu* parentMenu)
@@ -853,6 +959,95 @@ vector<Student> GetSortedStudentsList(bool(*sortFunction)(const Student&, const 
         }
     }
     return newList;
+}
+
+void __fastcall QuickSortInternal(vector<Student>& array, int startIndex, int count)
+{
+    auto left = startIndex;
+    auto right = count - 1;
+    auto value = array[(startIndex + count) / 2].GetTotalRITM();
+    do
+    {
+        while (array[left].GetTotalRITM() < value)
+            left++;
+
+        while (array[right].GetTotalRITM() > value)
+            right--;
+
+        if (left <= right)
+        {
+            std::swap(array[left], array[right]);
+            left++;
+            right--;
+        }
+    } while (left <= right);
+
+    if (startIndex < right)
+        QuickSortInternal(array, right, count);
+    if (count > left)
+        QuickSortInternal(array, startIndex, left);
+}
+
+void __fastcall MergeInternal(vector<Student>& mas, vector<Student>& t, int i, int l, int n)
+{
+    int j = i + 1;
+    int n1 = min(j, n);
+    int n2 = min(j + l, n);
+    int k = i;
+    
+    while (i < n1 && j < n2)
+    {
+        if (mas[i].GetTotalRITM() <= mas[j].GetTotalRITM())
+        {
+            t[k++] = mas[i++];
+        }
+        else
+        {
+            t[k++] = mas[j++];
+        }
+    }
+
+    while (i < n1)
+        t[k++] = mas[i++];
+
+    while (j < n2)
+        t[k++] = mas[j++];
+}
+
+vector<Student> GetSortedStudentsList(ESortingType sortingType)
+{
+    auto listClone = std::move(StudentsList);
+    auto arraySize = listClone.size();
+    switch (sortingType)
+    {
+        case ESortingType::Quick:
+        {
+            QuickSortInternal(listClone, 0, arraySize);
+            break;
+        }
+        case ESortingType::Merge:
+        {
+            vector<Student> tempClone(arraySize);
+            cout << tempClone.size() << endl;
+            int startIndex = 1;
+            int i;
+            while (startIndex < arraySize)
+            {
+                for (i = 0; i < arraySize; i += 2 * startIndex)
+                {
+                    MergeInternal(listClone, tempClone, i, startIndex, arraySize);
+                }
+                startIndex *= 2;
+                for (i = 0; i < arraySize; i += 2 * startIndex)
+                {
+                    MergeInternal(tempClone, listClone, i, startIndex, arraySize);
+                }
+                startIndex *= 2;
+            }
+            break;
+        }
+    }
+    return listClone;
 }
 
 void UpdateDBFile()
