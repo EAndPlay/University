@@ -188,69 +188,8 @@ inline void LeaveMenu()
     SwitchMenu(CurrentMenu->ParentMenu);
 }
 
-void __fastcall MergeInternaltest(int mas[], int t[], int i, int l, int n)
-{
-    int j = i + 1;
-    int n1 = min(j, n);
-    int n2 = min(j + l, n);
-    int k = i;
-
-    while (i < n1 && j < n2)
-    {
-        if (mas[i] <= mas[j])
-        {
-            t[k++] = mas[i++];
-        }
-        else
-        {
-            t[k++] = mas[j++];
-        }
-    }
-
-    while (i < n1)
-        t[k++] = mas[i++];
-
-    while (j < n2)
-        t[k++] = mas[j++];
-
-
-    for (int i = 0; i < 6; i++)
-    {
-        cout << t[i] << " ";
-    }
-    cout << endl;
-}
-
 int main()
 {
-    int unsorted[] = { 5, 1, 0, 6, 3, 9 };
-    int *temp = new int[6];
-    int startIndex = 1;
-    int i;
-    for (int i = 0; i < 6; i++)
-    {
-        cout << unsorted[i] << " ";
-    }
-    cout << endl;
-    while (startIndex < 6)
-    {
-        for (i = 0; i < 6; i += 2 * startIndex)
-        {
-            MergeInternaltest(unsorted, temp, i, startIndex, 6);
-        }
-        startIndex *= 2;
-        for (i = 0; i < 6; i += 2 * startIndex)
-        {
-            MergeInternaltest(temp, unsorted, i, startIndex, 6);
-        }
-        startIndex *= 2;
-    }
-    for (int i = 0; i < 6; i++)
-    {
-        cout << unsorted[i] << " ";
-    }
-    cout << endl;
-
     SetConsoleCP(kSymbolsTable);
     SetConsoleOutputCP(kSymbolsTable);
     InitializeMenus();
@@ -988,30 +927,21 @@ void __fastcall QuickSortInternal(vector<Student>& array, int startIndex, int co
         QuickSortInternal(array, startIndex, left);
 }
 
-void __fastcall MergeInternal(vector<Student>& mas, vector<Student>& t, int i, int l, int n)
+void __fastcall MergeInternal(std::vector<Student>& array, std::vector<Student>& t, int i, int l, int n)
 {
-    int j = i + 1;
+    int j = i + l;
     int n1 = min(j, n);
     int n2 = min(j + l, n);
     int k = i;
-    
+
     while (i < n1 && j < n2)
     {
-        if (mas[i].GetTotalRITM() <= mas[j].GetTotalRITM())
-        {
-            t[k++] = mas[i++];
-        }
-        else
-        {
-            t[k++] = mas[j++];
-        }
+        t[k++] = array[(array[i].GetTotalRITM() <= array[j].GetTotalRITM() ? i : j)++];
     }
-
     while (i < n1)
-        t[k++] = mas[i++];
-
+        t[k++] = array[i++];
     while (j < n2)
-        t[k++] = mas[j++];
+        t[k++] = array[j++];
 }
 
 vector<Student> GetSortedStudentsList(ESortingType sortingType)
@@ -1027,22 +957,17 @@ vector<Student> GetSortedStudentsList(ESortingType sortingType)
         }
         case ESortingType::Merge:
         {
-            vector<Student> tempClone(arraySize);
-            cout << tempClone.size() << endl;
-            int startIndex = 1;
+            vector<Student> tempArray(arraySize);
+            int leftIndex = 1;
             int i;
-            while (startIndex < arraySize)
+            while (leftIndex < arraySize)
             {
-                for (i = 0; i < arraySize; i += 2 * startIndex)
-                {
-                    MergeInternal(listClone, tempClone, i, startIndex, arraySize);
-                }
-                startIndex *= 2;
-                for (i = 0; i < arraySize; i += 2 * startIndex)
-                {
-                    MergeInternal(tempClone, listClone, i, startIndex, arraySize);
-                }
-                startIndex *= 2;
+                for (i = 0; i < arraySize; i += 2 * leftIndex)
+                    MergeInternal(listClone, tempArray, i, leftIndex, arraySize);
+                leftIndex *= 2;
+                for (i = 0; i < arraySize; i += 2 * leftIndex)
+                    MergeInternal(tempArray, listClone, i, leftIndex, arraySize);
+                leftIndex *= 2;
             }
             break;
         }
