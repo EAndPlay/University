@@ -927,21 +927,19 @@ void __fastcall QuickSortInternal(vector<Student>& array, int startIndex, int co
         QuickSortInternal(array, startIndex, left);
 }
 
-void __fastcall MergeInternal(std::vector<Student>& array, std::vector<Student>& t, int i, int l, int n)
+void __fastcall MergeInternal(std::vector<Student>& unsortedArray, std::vector<Student>& sortedArray, int i, int rightIndex, int size)
 {
-    int j = i + l;
-    int n1 = min(j, n);
-    int n2 = min(j + l, n);
+    int j = i + rightIndex;
+    int n1 = min(j, size);
+    int n2 = min(j + rightIndex, size);
     int k = i;
 
     while (i < n1 && j < n2)
-    {
-        t[k++] = array[(array[i].GetTotalRITM() <= array[j].GetTotalRITM() ? i : j)++];
-    }
+        sortedArray[k++] = unsortedArray[(unsortedArray[i].GetTotalRITM() <= unsortedArray[j].GetTotalRITM() ? i : j)++];
     while (i < n1)
-        t[k++] = array[i++];
+        sortedArray[k++] = unsortedArray[i++];
     while (j < n2)
-        t[k++] = array[j++];
+        sortedArray[k++] = unsortedArray[j++];
 }
 
 vector<Student> GetSortedStudentsList(ESortingType sortingType)
@@ -958,16 +956,16 @@ vector<Student> GetSortedStudentsList(ESortingType sortingType)
         case ESortingType::Merge:
         {
             vector<Student> tempArray(arraySize);
-            int leftIndex = 1;
+            int rightIndex = 1;
             int i;
-            while (leftIndex < arraySize)
+            while (rightIndex < arraySize)
             {
-                for (i = 0; i < arraySize; i += 2 * leftIndex)
-                    MergeInternal(listClone, tempArray, i, leftIndex, arraySize);
-                leftIndex *= 2;
-                for (i = 0; i < arraySize; i += 2 * leftIndex)
-                    MergeInternal(tempArray, listClone, i, leftIndex, arraySize);
-                leftIndex *= 2;
+                for (i = 0; i < arraySize; i += 2 * rightIndex)
+                    MergeInternal(listClone, tempArray, i, rightIndex, arraySize);
+                rightIndex *= 2;
+                for (i = 0; i < arraySize; i += 2 * rightIndex)
+                    MergeInternal(tempArray, listClone, i, rightIndex, arraySize);
+                rightIndex *= 2;
             }
             break;
         }
