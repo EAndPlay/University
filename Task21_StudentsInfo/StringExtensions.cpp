@@ -99,3 +99,23 @@ char strcmpic(const char* str1, const char* str2)
 
     return 0;
 }
+
+char strcmpico(const char* str1, const char* str2)
+{
+    size_t str1_length = strlen(str1);
+    size_t str2_length = strlen(str2);
+
+    int leftOperand, rightOperand;
+
+    for (int i = 0; i < str2_length; i++)
+    {
+        if ((leftOperand = str1[i] | 0b00100000) == (rightOperand = str2[i] | 0b00100000))
+        {
+            continue;
+        }
+
+        return leftOperand < rightOperand;
+    }
+
+    return str1_length == str2_length ? -1 : (str1_length < str2_length ? 3 : 2);
+}
