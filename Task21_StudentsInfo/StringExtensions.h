@@ -11,3 +11,6 @@ char** strSplit(const char*, const char*, int&);
 
 //Compares string ignoring register case (ic)
 char strcmpic(const char*, const char*);
+
+//Compares string ignoring register case by order (ic)
+char strcmpico(const char*, const char*);
