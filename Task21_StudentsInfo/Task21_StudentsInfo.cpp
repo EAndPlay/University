@@ -99,20 +99,19 @@ typedef struct student_t
         const int kStringsCount = sizeof(FullName) / kMaxStringLength;
 
         auto fullName = (char*)&this->FullName;
-        auto cleanSND = (char*)alloca(sizeof(FullName));
+        auto cleanSND = (char*)calloc(sizeof(FullName), sizeof(char));
 
         int fullNameLength = 0;
         for (int i = 0; i < kStringsCount; i++)
         {
-            //error
-            cout << fullName;
-            auto string = reinterpret_cast<char*>(fullName + kMaxStringLength * i);
-            cout << string;
+            auto string = reinterpret_cast<char*>((int)(fullName) + kMaxStringLength * i);
+
+            if (this->LocalStudentId == 10) cout << string;
             auto strLength = strlen(string);
             memcpy((void*)(size_t(cleanSND) + fullNameLength), string, strLength);
             fullNameLength += strLength;
         }
-        return (char*)realloc(cleanSND, fullNameLength);
+        return cleanSND;
     }
 } Student;
 
@@ -125,7 +124,7 @@ const char* kInvalidInputTypeException = "Неверный тип данных."
 const char* kStudentIdNotFoundException = "Студента с таким ID не найдено.";
 const char* kStudentSNDNotFoundException = "Студента с таким ФИО не найдено.";
 const char* kNotAvaibleInfoException = "N/A";
-const char kDBFilePath[kMaxFilePath] = "Z:\\Development\\University\\Debug\\StudentsInfo.bin";
+const char kDBFilePath[kMaxFilePath] = "D:\\Студенты\\1-43\\Гонцов А.М\\University\\Debug\\StudentsInfo.bin";
 
 typedef Student* TreeNodeElementType;
 
@@ -268,9 +267,17 @@ int main()
     }
     DBFileStreamRead.close();
     BinaryTreeStart = nullptr;
-    GenerateBinaryTree();
+    ////GenerateBinaryTree();
+    ////auto node = BinaryTreeStart;
+    ////for (int i = 0; i < 4; i++)
+    ////{
+    ////    cout << node->Element->GetCleanFullName() << endl;
+    ////    node = node->RightNode;
+    ////}
+    //cout << BinaryTreeStart->RightNode->RightNode->RightNode->Element->GetCleanFullName() << endl;
+    //cout << BinaryTreeStart->LeftNode->Element->GetCleanFullName() << ' ' << BinaryTreeStart->RightNode->Element->GetCleanFullName();
 
-    MainMenu->BaseOnShow();
+    CurrentMenu->BaseOnShow();
     system("pause");
     return 0;
 }
@@ -488,6 +495,14 @@ void InitializeMenus()
                 SwitchMenu(SortMenu);
             }
         };
+        MenuAction switchToBinarySearch =
+        {
+            "Бинарный поиск",
+            []
+            {
+                SwitchMenu(BinaryTreeSearchMenu);
+            }
+        };
         MenuAction exitApp =
         {
             "Завершить",
@@ -503,6 +518,7 @@ void InitializeMenus()
         MainMenu->Actions.push_back(actionAddStudent);
         MainMenu->Actions.push_back(actionDeleteStudent);
         MainMenu->Actions.push_back(actionSortStudents);
+        MainMenu->Actions.push_back(switchToBinarySearch);
         MainMenu->Actions.push_back(exitApp);
         MainMenu->ActionCompleted = []
         {
@@ -876,10 +892,12 @@ void InitializeMenus()
     {
 
         BinaryTreeSearchMenu->Actions.push_back(actionSwitchBack);
-        FindEditMenu->OverrideOnShow = []
+        BinaryTreeSearchMenu->OverrideOnShow = []
         {
+            cin.get();
             cout << "ФИО студента: ";
             snd = ReadLine();
+            char* cleanSND = nullptr;
             if (strlen(snd))
             {
                 splitCount = 0;
@@ -897,7 +915,7 @@ void InitializeMenus()
                     LeaveMenu();
                     return;
                 }
-                auto cleanSND = (char*) malloc(strlen(snd) - 2); // 2 = spaces between words
+                cleanSND = (char*)malloc(strlen(snd) - 2); // 2 = spaces between words
                 int cleanSNDLength = 0;
                 for (int i = 0; i < splitCount; i++)
                 {
@@ -915,32 +933,30 @@ void InitializeMenus()
             }
             TargetStudent = nullptr;
             auto treeNode = BinaryTreeStart;
-            auto cleanNewSND = StudentsList[i].GetCleanFullName();
             char* cleanSourceSND = nullptr;
             while (treeNode)
             {
+                cout << "[dbg] id: " << '{' << treeNode->Element->LocalStudentId << '}' << endl;
                 auto cleanSourceSND = (char*)treeNode->GetData(GetCleanSND);
-                auto cmpStrs = strcmpico(cleanNewSND, cleanSourceSND);
+                auto cmpStrs = strcmpico(cleanSND, cleanSourceSND);
+                cout << "[dbg] cur node: " << cleanSourceSND << endl;
                 if (cmpStrs == -1 || cmpStrs == 3)
                 {
+                    //id 10 issue
                     TargetStudent = treeNode->Element;
+                    cout << "[dbg] " << TargetStudent->LocalStudentId << ' ' << (int)cmpStrs << endl;
+                    cout << "[dbg] " << cleanSND << ' ' << cleanSourceSND << endl;
                     free(cleanSourceSND);
                     goto CycleExit;
                 }
-                auto nodeToPlace = &treeNode->RightNode + cmpStrs;
-                if (*nodeToPlace)
-                {
-                    treeNode = *nodeToPlace;
-                    free(cleanSourceSND);
-                }
+                cout << "[dbg] cmpStrs: " << cmpStrs << endl;
+                if (treeNode->Element->LocalStudentId != 8)
+                    treeNode = treeNode->RightNode + cmpStrs;
                 else
-                {
-                    *nodeToPlace = new TreeNode(treeNode);
-                    (*nodeToPlace)->Element = &StudentsList[i];
-                }
+                    treeNode = treeNode->RightNode;
             }
-            CycleExit:
-            free(cleanNewSND);
+        CycleExit:
+            free(cleanSND);
             if (!TargetStudent)
             {
                 cout << kStudentSNDNotFoundException << endl;
@@ -950,10 +966,6 @@ void InitializeMenus()
             {
                 SwitchMenu(FindEditMenu, MainMenu);
             }
-        };
-        BinaryTreeSearchMenu->ActionCompleted = []
-        {
-            SwitchMenu(ConfirmMenu, MainMenu);
         };
         BinaryTreeSearchMenu->AllowOverride = true;
         BinaryTreeSearchMenu->Caption = "Поиск в бинарном дереве по ФИО:";
@@ -1044,7 +1056,7 @@ vector<Student> GetSortedStudentsList(bool(*sortFunction)(const Student&, const 
         for (int i = 1; i < newList.size(); i++)
         {
             if (!sortFunction(newList[i - 1], newList[i]))
-            //if (StudentsList[i].GetTotalRITM() > StudentsList[i - 1].GetTotalRITM())
+                //if (StudentsList[i].GetTotalRITM() > StudentsList[i - 1].GetTotalRITM())
             {
                 std::swap(newList[i], newList[i - 1]);
                 isSorted = true;
@@ -1102,27 +1114,27 @@ vector<Student> GetSortedStudentsList(ESortingType sortingType)
     auto arraySize = listClone.size();
     switch (sortingType)
     {
-        case ESortingType::Quick:
+    case ESortingType::Quick:
+    {
+        QuickSortInternal(listClone, 0, arraySize);
+        break;
+    }
+    case ESortingType::Merge:
+    {
+        vector<Student> tempArray(arraySize);
+        int rightIndex = 1;
+        int i;
+        while (rightIndex < arraySize)
         {
-            QuickSortInternal(listClone, 0, arraySize);
-            break;
+            for (i = 0; i < arraySize; i += 2 * rightIndex)
+                MergeInternal(listClone, tempArray, i, rightIndex, arraySize);
+            rightIndex *= 2;
+            for (i = 0; i < arraySize; i += 2 * rightIndex)
+                MergeInternal(tempArray, listClone, i, rightIndex, arraySize);
+            rightIndex *= 2;
         }
-        case ESortingType::Merge:
-        {
-            vector<Student> tempArray(arraySize);
-            int rightIndex = 1;
-            int i;
-            while (rightIndex < arraySize)
-            {
-                for (i = 0; i < arraySize; i += 2 * rightIndex)
-                    MergeInternal(listClone, tempArray, i, rightIndex, arraySize);
-                rightIndex *= 2;
-                for (i = 0; i < arraySize; i += 2 * rightIndex)
-                    MergeInternal(tempArray, listClone, i, rightIndex, arraySize);
-                rightIndex *= 2;
-            }
-            break;
-        }
+        break;
+    }
     }
     return listClone;
 }
@@ -1148,7 +1160,7 @@ void GenerateBinaryTree()
         char* cleanSourceSND = nullptr;
         while (treeNode)
         {
-            auto cleanSourceSND = (char*)treeNode->GetData(GetCleanSND);
+            cleanSourceSND = (char*)treeNode->GetData(GetCleanSND);
             auto cmpStrs = strcmpico(cleanNewSND, cleanSourceSND);
             if (cmpStrs == -1) break; // if (cmpStrs & 0x8000'0000)
             if (cmpStrs >= 2) cmpStrs -= 2;
