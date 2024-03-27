@@ -98,14 +98,18 @@ typedef struct student_t
     {
         const int kStringsCount = sizeof(FullName) / kMaxStringLength;
 
-        auto fullName = (char**) &this->FullName;
+        auto fullName = (char*)&this->FullName;
         auto cleanSND = (char*)alloca(sizeof(FullName));
 
         int fullNameLength = 0;
         for (int i = 0; i < kStringsCount; i++)
         {
-            auto strLength = strlen(fullName[i]);
-            memcpy((void*)(size_t(cleanSND) + fullNameLength), fullName[i], strLength);
+            //error
+            cout << fullName;
+            auto string = reinterpret_cast<char*>(fullName + kMaxStringLength * i);
+            cout << string;
+            auto strLength = strlen(string);
+            memcpy((void*)(size_t(cleanSND) + fullNameLength), string, strLength);
             fullNameLength += strLength;
         }
         return (char*)realloc(cleanSND, fullNameLength);
@@ -118,7 +122,8 @@ const int kMaxFilePath = 255;
 
 const char* kInvalidActionIdException = "Неверный номер действия.";
 const char* kInvalidInputTypeException = "Неверный тип данных.";
-const char* kNoSuchStudentIdException = "Студента с таким ID не найдено.";
+const char* kStudentIdNotFoundException = "Студента с таким ID не найдено.";
+const char* kStudentSNDNotFoundException = "Студента с таким ФИО не найдено.";
 const char* kNotAvaibleInfoException = "N/A";
 const char kDBFilePath[kMaxFilePath] = "Z:\\Development\\University\\Debug\\StudentsInfo.bin";
 
@@ -214,7 +219,7 @@ static IMenu* MarksMenu;
 static IMenu* FCGMenu;
 static IMenu* CreateStudentMenu;
 static IMenu* SortMenu;
-static IMenu* BinaryTreeSearch;
+static IMenu* BinaryTreeSearchMenu;
 
 IMenu* CurrentMenu;
 
@@ -355,7 +360,7 @@ void InitializeMenus()
     FCGMenu = new IMenu();
     CreateStudentMenu = new IMenu();
     SortMenu = new IMenu();
-    BinaryTreeSearch = new IMenu();
+    BinaryTreeSearchMenu = new IMenu();
 
     // MainMenu
     {
@@ -463,7 +468,7 @@ void InitializeMenus()
                 }
                 if (eraseIndex == -1)
                 {
-                    cout << kNoSuchStudentIdException << endl;
+                    cout << kStudentIdNotFoundException << endl;
                     LeaveMenu();
                     return;
                 }
@@ -577,7 +582,7 @@ void InitializeMenus()
             }
             if (!TargetStudent)
             {
-                cout << kNoSuchStudentIdException << endl;
+                cout << kStudentIdNotFoundException << endl;
                 LeaveMenu();
             }
         };
@@ -867,10 +872,10 @@ void InitializeMenus()
     }
     // SortMenu
 
-    // BinaryTreeSearch
+    // BinaryTreeSearchMenu
     {
 
-        BinaryTreeSearch->Actions.push_back(actionSwitchBack);
+        BinaryTreeSearchMenu->Actions.push_back(actionSwitchBack);
         FindEditMenu->OverrideOnShow = []
         {
             cout << "ФИО студента: ";
@@ -918,7 +923,9 @@ void InitializeMenus()
                 auto cmpStrs = strcmpico(cleanNewSND, cleanSourceSND);
                 if (cmpStrs == -1 || cmpStrs == 3)
                 {
-                    // TODO: FINISH!!!
+                    TargetStudent = treeNode->Element;
+                    free(cleanSourceSND);
+                    goto CycleExit;
                 }
                 auto nodeToPlace = &treeNode->RightNode + cmpStrs;
                 if (*nodeToPlace)
@@ -932,21 +939,27 @@ void InitializeMenus()
                     (*nodeToPlace)->Element = &StudentsList[i];
                 }
             }
+            CycleExit:
             free(cleanNewSND);
             if (!TargetStudent)
             {
-                cout << kNoSuchStudentIdException << endl;
+                cout << kStudentSNDNotFoundException << endl;
                 LeaveMenu();
             }
+            else
+            {
+                SwitchMenu(FindEditMenu, MainMenu);
+            }
         };
-        BinaryTreeSearch->ActionCompleted = []
+        BinaryTreeSearchMenu->ActionCompleted = []
         {
             SwitchMenu(ConfirmMenu, MainMenu);
         };
-        BinaryTreeSearch->Caption = "Поиск в бинарном дереве по ФИО:";
-        BinaryTreeSearch->ParentMenu = MainMenu;
+        BinaryTreeSearchMenu->AllowOverride = true;
+        BinaryTreeSearchMenu->Caption = "Поиск в бинарном дереве по ФИО:";
+        BinaryTreeSearchMenu->ParentMenu = MainMenu;
     }
-    // BinaryTreeSearch
+    // BinaryTreeSearchMenu
 }
 
 void __fastcall SwitchMenu(IMenu* newMenu, IMenu* parentMenu)
