@@ -98,15 +98,14 @@ typedef struct student_t
     {
         const int kStringsCount = sizeof(FullName) / kMaxStringLength;
 
-        auto fullName = (char*)&this->FullName;
-        auto cleanSND = (char*)calloc(sizeof(FullName), sizeof(char));
+        auto fullName = reinterpret_cast<char*>(&this->FullName);
+        auto cleanSND = reinterpret_cast<char*>(calloc(sizeof(FullName), sizeof(char)));
 
         int fullNameLength = 0;
         for (int i = 0; i < kStringsCount; i++)
         {
-            auto string = reinterpret_cast<char*>((int)(fullName) + kMaxStringLength * i);
+            auto string = reinterpret_cast<char*>((int)(fullName)+kMaxStringLength * i);
 
-            if (this->LocalStudentId == 10) cout << string;
             auto strLength = strlen(string);
             memcpy((void*)(size_t(cleanSND) + fullNameLength), string, strLength);
             fullNameLength += strLength;
@@ -124,7 +123,7 @@ const char* kInvalidInputTypeException = "Неверный тип данных."
 const char* kStudentIdNotFoundException = "Студента с таким ID не найдено.";
 const char* kStudentSNDNotFoundException = "Студента с таким ФИО не найдено.";
 const char* kNotAvaibleInfoException = "N/A";
-const char kDBFilePath[kMaxFilePath] = "D:\\Студенты\\1-43\\Гонцов А.М\\University\\Debug\\StudentsInfo.bin";
+const char kDBFilePath[kMaxFilePath] = "Z:\\Development\\University\\Debug\\StudentsInfo.bin";
 
 typedef Student* TreeNodeElementType;
 
@@ -240,6 +239,7 @@ vector<Student> GetSortedStudentsList(bool(*)(const Student&, const Student&));
 vector<Student> GetSortedStudentsList(ESortingType);
 void* GetCleanSND(TreeNode*);
 void GenerateBinaryTree();
+void SuffixTreeNodeOutput(TreeNode*);
 void __fastcall OutputStudentInfo(Student*);
 void __fastcall SwitchMenu(IMenu*, IMenu* = nullptr);
 void InitializeMenus();
@@ -262,20 +262,12 @@ int main()
     while (DBFileStreamRead.peek() != EOF)
     {
         Student student{};
-        DBFileStreamRead.read((char*)&student, sizeof(Student));
+        DBFileStreamRead.read(reinterpret_cast<char*>(&student), sizeof(Student));
         StudentsList.push_back(student);
     }
     DBFileStreamRead.close();
     BinaryTreeStart = nullptr;
-    ////GenerateBinaryTree();
-    ////auto node = BinaryTreeStart;
-    ////for (int i = 0; i < 4; i++)
-    ////{
-    ////    cout << node->Element->GetCleanFullName() << endl;
-    ////    node = node->RightNode;
-    ////}
-    //cout << BinaryTreeStart->RightNode->RightNode->RightNode->Element->GetCleanFullName() << endl;
-    //cout << BinaryTreeStart->LeftNode->Element->GetCleanFullName() << ' ' << BinaryTreeStart->RightNode->Element->GetCleanFullName();
+    GenerateBinaryTree();
 
     CurrentMenu->BaseOnShow();
     system("pause");
@@ -323,7 +315,7 @@ void ChangeStudentProperty(EStudentProperty property)
                 memset(&TargetStudent->FullName, 0, sizeof(FullName));
                 for (char i = 0; i < 3; i++)
                 {
-                    memcpy((char*)(&TargetStudent->FullName.Surname) + kMaxStringLength * i, sndSplit[i], strlen(sndSplit[i]));
+                    memcpy(reinterpret_cast<char*>(&TargetStudent->FullName.Surname) + kMaxStringLength * i, sndSplit[i], strlen(sndSplit[i]));
                     //cout << i << endl;
                     //if (sndSplit[i])
                     //    free(sndSplit[i]);
@@ -495,9 +487,18 @@ void InitializeMenus()
                 SwitchMenu(SortMenu);
             }
         };
+        MenuAction outputBinaryTree =
+        {
+            "Вывести бинарное дерево",
+            []
+            {
+                cout << "Бинарное дерево в суффиксном виде:" << endl;
+                SuffixTreeNodeOutput(BinaryTreeStart);
+            }
+        };
         MenuAction switchToBinarySearch =
         {
-            "Бинарный поиск",
+            "Поиск по бинарному дереву",
             []
             {
                 SwitchMenu(BinaryTreeSearchMenu);
@@ -518,6 +519,7 @@ void InitializeMenus()
         MainMenu->Actions.push_back(actionAddStudent);
         MainMenu->Actions.push_back(actionDeleteStudent);
         MainMenu->Actions.push_back(actionSortStudents);
+        MainMenu->Actions.push_back(outputBinaryTree);
         MainMenu->Actions.push_back(switchToBinarySearch);
         MainMenu->Actions.push_back(exitApp);
         MainMenu->ActionCompleted = []
@@ -762,7 +764,7 @@ void InitializeMenus()
                 }
                 TargetStudent->Course = atoi(inputSplit[0]);
                 TargetStudent->Group = atoi(inputSplit[1]);
-                switch (*((char*)inputSplit[1] + _msize(inputSplit[1]) - 1))
+                switch (*(reinterpret_cast<char*>(inputSplit[1]) + _msize(inputSplit[1]) - 1))
                 {
                 case 'М':
                 case 'м':
@@ -898,10 +900,12 @@ void InitializeMenus()
             cout << "ФИО студента: ";
             snd = ReadLine();
             char* cleanSND = nullptr;
-            if (strlen(snd))
+            int sndLength;
+            if (sndLength = strlen(snd))
             {
                 splitCount = 0;
                 sndSplit = strSplit(snd, " ", splitCount);
+                cleanSND = reinterpret_cast<char*>(calloc(strlen(snd) - 2, sizeof(char))); // 2 = spaces between words
                 if (splitCount > 3)
                 {
                     free(snd);
@@ -912,16 +916,25 @@ void InitializeMenus()
                         free(sndSplit);
                     }
                     cout << kInvalidInputTypeException << endl;
+                    free(cleanSND);
                     LeaveMenu();
                     return;
                 }
-                cleanSND = (char*)malloc(strlen(snd) - 2); // 2 = spaces between words
-                int cleanSNDLength = 0;
-                for (int i = 0; i < splitCount; i++)
+                else if (splitCount)
                 {
-                    auto splitLength = strlen(sndSplit[i]);
-                    memcpy((void*)(size_t(cleanSND) + cleanSNDLength), sndSplit[i], splitLength);
-                    cleanSNDLength += splitLength;
+                    int cleanSNDLength = 0;
+                    for (int i = 0; i < splitCount; i++)
+                    {
+                        auto splitLength = strlen(sndSplit[i]);
+                        memcpy((void*)(size_t(cleanSND) + cleanSNDLength), sndSplit[i], splitLength);
+                        cleanSNDLength += splitLength;
+                    }
+                    cleanSND[cleanSNDLength] = '\0';
+                }
+                else
+                {
+                    memcpy(cleanSND, snd, sndLength);
+                    cleanSND[sndLength] = '\0';
                 }
                 free(sndSplit);
                 free(snd);
@@ -936,27 +949,19 @@ void InitializeMenus()
             char* cleanSourceSND = nullptr;
             while (treeNode)
             {
-                cout << "[dbg] id: " << '{' << treeNode->Element->LocalStudentId << '}' << endl;
-                auto cleanSourceSND = (char*)treeNode->GetData(GetCleanSND);
+                auto cleanSourceSND = reinterpret_cast<char*>(treeNode->GetData(GetCleanSND));
                 auto cmpStrs = strcmpico(cleanSND, cleanSourceSND);
-                cout << "[dbg] cur node: " << cleanSourceSND << endl;
                 if (cmpStrs == -1 || cmpStrs == 3)
                 {
                     //id 10 issue
                     TargetStudent = treeNode->Element;
-                    cout << "[dbg] " << TargetStudent->LocalStudentId << ' ' << (int)cmpStrs << endl;
-                    cout << "[dbg] " << cleanSND << ' ' << cleanSourceSND << endl;
                     free(cleanSourceSND);
                     goto CycleExit;
                 }
-                cout << "[dbg] cmpStrs: " << cmpStrs << endl;
-                if (treeNode->Element->LocalStudentId != 8)
-                    treeNode = treeNode->RightNode + cmpStrs;
-                else
-                    treeNode = treeNode->RightNode;
+                treeNode = cmpStrs ? treeNode->LeftNode : treeNode->RightNode;
             }
         CycleExit:
-            free(cleanSND);
+            //free(cleanSND);
             if (!TargetStudent)
             {
                 cout << kStudentSNDNotFoundException << endl;
@@ -1144,6 +1149,15 @@ void* GetCleanSND(TreeNode* treeNode)
     return treeNode->Element->GetCleanFullName();
 }
 
+void SuffixTreeNodeOutput(TreeNode* treeNode)
+{
+    if (!treeNode) return;
+    SuffixTreeNodeOutput(treeNode->LeftNode);
+    SuffixTreeNodeOutput(treeNode->RightNode);
+    auto fullName = treeNode->Element->FullName;
+    std::cout << '-' << fullName.Surname << ' ' << fullName.Name << ' ' << fullName.DadSurname << endl;
+}
+
 void GenerateBinaryTree()
 {
     if (BinaryTreeStart)
@@ -1160,7 +1174,7 @@ void GenerateBinaryTree()
         char* cleanSourceSND = nullptr;
         while (treeNode)
         {
-            cleanSourceSND = (char*)treeNode->GetData(GetCleanSND);
+            cleanSourceSND = reinterpret_cast<char*>(treeNode->GetData(GetCleanSND));
             auto cmpStrs = strcmpico(cleanNewSND, cleanSourceSND);
             if (cmpStrs == -1) break; // if (cmpStrs & 0x8000'0000)
             if (cmpStrs >= 2) cmpStrs -= 2;
@@ -1186,7 +1200,7 @@ void UpdateDBFile()
     DBFileStreamWrite.open(kDBFilePath, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
     for (int i = 0; i < StudentsList.size(); i++)
     {
-        DBFileStreamWrite.write((char*)&StudentsList[i], sizeof(Student));
+        DBFileStreamWrite.write(reinterpret_cast<char*>(&StudentsList[i]), sizeof(Student));
     }
     //DBFileStreamWrite.write((char*)&StudentsList, sizeof(Student) * StudentsList.size());
     DBFileStreamWrite.close();
