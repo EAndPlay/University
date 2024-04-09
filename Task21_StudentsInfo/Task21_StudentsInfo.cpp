@@ -1,10 +1,9 @@
-//Лабораторная работа по программированию №7. "Проверка" Вариант №21. Гонцов А.М 1-43
+//Лабораторные работы по программированию №7, 9, 10. "Проверка" Вариант №21. Гонцов А.М 1-43
 
 #include <iostream>
 #include <windows.h>
 #include <fstream>
 #include <vector>
-#include <filesystem>
 
 #include "StringExtensions.h"
 
@@ -12,7 +11,7 @@ using std::cout, std::cin, std::endl, std::vector, std::string, std::fstream;
 
 enum class EStudentProperty : byte
 {
-    SND,
+    SND, // Surname Name Dadsurname
     Marks,
     FCG // Faculty Course Group
 };
@@ -126,7 +125,6 @@ const char* kNotAvaibleInfoException = "N/A";
 const char kDBFilePath[kMaxFilePath] = "Z:\\Development\\University\\Debug\\StudentsInfo.bin";
 
 typedef Student* TreeNodeElementType;
-
 typedef struct tagTREENODE
 {
     TreeNodeElementType Element;
@@ -153,7 +151,7 @@ typedef struct tagTREENODE
         for (tagTREENODE** i = &LeftNode; i < &RightNode; i++)
         {
             if (!*i) continue;
-            delete(*i);
+            (*i)->Delete();
             *i = nullptr;
         }
         delete(this);
@@ -210,26 +208,27 @@ typedef struct tagMENU
     }
 } IMenu;
 
-static IMenu* MainMenu;
-static IMenu* FindEditMenu;
-static IMenu* ConfirmMenu;
-static IMenu* MarksMenu;
-static IMenu* FCGMenu;
-static IMenu* CreateStudentMenu;
-static IMenu* SortMenu;
-static IMenu* BinaryTreeSearchMenu;
+static IMenu* MainMenu; // главное меню
+static IMenu* FindEditMenu; // меню редактирования
+static IMenu* ConfirmMenu; // меню подтверждения
+static IMenu* MarksMenu; // меню изменения оценок
+static IMenu* FCGMenu; // меню изменения факультета, курса-группы
+static IMenu* CreateStudentMenu; // меню создания студента
+static IMenu* SortMenu; // меню сортировок
+static IMenu* BinaryTreeSearchMenu; // меню поиска в бинарном дереве
 
-IMenu* CurrentMenu;
+IMenu* CurrentMenu; // текущее меню
 
-void(*ActionToConfirm)();
-EStudentProperty ChoiceToChange;
-Student* TargetStudent;
+void(*ActionToConfirm)(); // функция, требуемая подтверждения
+EStudentProperty ChoiceToChange; // свойство для изменения
+Student* TargetStudent; // студент для редактирования
 
-static vector<Student> StudentsList;
-static std::ofstream DBFileStreamWrite;
-static std::ifstream DBFileStreamRead;
+static TreeNode* BinaryTreeStart; // начало бинарного дерева
 
-static TreeNode* BinaryTreeStart;
+static vector<Student> StudentsList; // список студентов
+
+static std::ofstream DBFileStreamWrite; // io поток чтения
+static std::ifstream DBFileStreamRead; // io поток записи
 
 const int FileReadWriteFlags = std::ios_base::in | std::ios_base::out | std::ios_base::binary;
 const int FileReadWriteRecreateFlags = FileReadWriteFlags | std::ios_base::trunc;
@@ -302,8 +301,6 @@ void ChangeStudentProperty(EStudentProperty property)
                 free(snd);
                 if (sndSplit)
                 {
-                    //for (int i = 0; i < splitCount; i++)
-                    //    free(sndSplit[i]);
                     free(sndSplit);
                 }
                 cout << kInvalidInputTypeException << endl;
@@ -316,9 +313,6 @@ void ChangeStudentProperty(EStudentProperty property)
                 for (char i = 0; i < 3; i++)
                 {
                     memcpy(reinterpret_cast<char*>(&TargetStudent->FullName.Surname) + kMaxStringLength * i, sndSplit[i], strlen(sndSplit[i]));
-                    //cout << i << endl;
-                    //if (sndSplit[i])
-                    //    free(sndSplit[i]);
                 }
                 free(sndSplit);
                 free(snd);
@@ -393,7 +387,7 @@ void InitializeMenus()
                 {
                     DBFileStreamWrite.open(kDBFilePath, std::ios_base::trunc);
                     DBFileStreamWrite.close();
-                    UpdateDBFile();
+                    StudentsList.clear();
                 };
                 SwitchMenu(ConfirmMenu, MainMenu);
             }
@@ -416,7 +410,7 @@ void InitializeMenus()
                 if (StudentsList.size())
                 {
                     newStudent.LocalStudentId = 0;
-                    auto sortedList = GetSortedStudentsList([](const Student& a, const Student& b) -> bool
+                    auto sortedList = GetSortedStudentsList([](const Student& a, const Student& b)
                         {
                             return a.LocalStudentId < b.LocalStudentId;
                         });
@@ -473,6 +467,8 @@ void InitializeMenus()
                 }
                 ActionToConfirm = []
                 {
+                    auto studentToErase = StudentsList[eraseIndex];
+                    cout << "Студент: [" << studentToErase.LocalStudentId << "] " << studentToErase.FullName.Surname << ' ' << studentToErase.FullName.Name << ' ' << studentToErase.FullName.DadSurname << " - был удалён." << endl;
                     StudentsList.erase(StudentsList.begin() + eraseIndex);
                     UpdateDBFile();
                 };
@@ -733,7 +729,6 @@ void InitializeMenus()
             {
             case 0:
             {
-                cout << "fac size: " << sizeof(FacultiesNamesRU) / sizeof(*FacultiesNamesRU) << endl;
                 TargetStudent->Faculty = static_cast<EFaculties>(0);
                 for (int i = 0; i < sizeof(FacultiesNamesRU) / sizeof(*FacultiesNamesRU); i++)
                 {
@@ -747,7 +742,6 @@ void InitializeMenus()
                 {
                     cout << "Введён несуществующий факультет. Факультет у студента был обнулён." << endl;
                 }
-                // TODO
                 break;
             }
             case 1:
@@ -760,7 +754,6 @@ void InitializeMenus()
                     cin.ignore();
                     cout << kInvalidInputTypeException << endl;
                     LeaveMenu();
-                    goto FCGShowReturn;
                 }
                 TargetStudent->Course = atoi(inputSplit[0]);
                 TargetStudent->Group = atoi(inputSplit[1]);
@@ -778,15 +771,6 @@ void InitializeMenus()
                     TargetStudent->Degree = EGraduateDegree::Bachelor;
                     break;
                 }
-
-            FCGShowReturn:
-                //if (splitCount)
-                //{
-                //    free(inputSplit[0]);
-                //    free(inputSplit[1]);
-                //    free(inputSplit);
-                //}
-                break;
             }
             }
             free(inputLine);
@@ -796,10 +780,6 @@ void InitializeMenus()
         FCGMenu->Actions.push_back(actionFacultyChoice);
         FCGMenu->Actions.push_back(actionCourseGroupChoice);
         FCGMenu->Actions.push_back(actionSwitchBack);
-        //FCGMenu->ActionCompleted = []
-        //{
-        //    UpdateDBFile();
-        //};
         FCGMenu->Caption = "Что изменить:";
     }
     // FCGMenu
@@ -911,8 +891,6 @@ void InitializeMenus()
                     free(snd);
                     if (sndSplit)
                     {
-                        //for (int i = 0; i < splitCount; i++)
-                        //    free(sndSplit[i]);
                         free(sndSplit);
                     }
                     cout << kInvalidInputTypeException << endl;
@@ -953,15 +931,13 @@ void InitializeMenus()
                 auto cmpStrs = strcmpico(cleanSND, cleanSourceSND);
                 if (cmpStrs == -1 || cmpStrs == 3)
                 {
-                    //id 10 issue
                     TargetStudent = treeNode->Element;
                     free(cleanSourceSND);
                     goto CycleExit;
                 }
-                treeNode = cmpStrs ? treeNode->LeftNode : treeNode->RightNode;
+                treeNode = *(&treeNode->RightNode + cmpStrs);
             }
         CycleExit:
-            //free(cleanSND);
             if (!TargetStudent)
             {
                 cout << kStudentSNDNotFoundException << endl;
@@ -1061,7 +1037,6 @@ vector<Student> GetSortedStudentsList(bool(*sortFunction)(const Student&, const 
         for (int i = 1; i < newList.size(); i++)
         {
             if (!sortFunction(newList[i - 1], newList[i]))
-                //if (StudentsList[i].GetTotalRITM() > StudentsList[i - 1].GetTotalRITM())
             {
                 std::swap(newList[i], newList[i - 1]);
                 isSorted = true;
@@ -1202,6 +1177,5 @@ void UpdateDBFile()
     {
         DBFileStreamWrite.write(reinterpret_cast<char*>(&StudentsList[i]), sizeof(Student));
     }
-    //DBFileStreamWrite.write((char*)&StudentsList, sizeof(Student) * StudentsList.size());
     DBFileStreamWrite.close();
 }
